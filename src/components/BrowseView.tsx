@@ -61,36 +61,36 @@ export const BrowseView: React.FC<BrowseViewProps> = ({
   }, [activeType, searchQuery, priceRange, bedrooms, bathrooms, propertyType]);
 
   return (
-    <div className="min-h-screen bg-background pt-8 pb-20">
-      <div className="max-w-7xl mx-auto px-6">
+    <div className="min-h-screen bg-background pt-12 pb-24">
+      <div className="max-w-7xl mx-auto px-4 md:px-6">
         {/* Header & Type Toggle */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
-          <div>
-            <h1 className="text-4xl font-black text-primary tracking-tight mb-2">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+          <div className="space-y-2">
+            <h1 className="text-4xl md:text-6xl font-black text-primary tracking-tighter leading-none">
               {activeType === 'buy' ? 'Properties for Sale' : 'Properties for Rent'}
             </h1>
-            <p className="text-on-surface-variant font-medium">
-              Discover {filteredProperties.length} verified listings in The Gambia
+            <p className="text-lg text-on-surface-variant font-bold">
+              Discover {filteredProperties.length} verified listings in <span className="text-secondary italic">The Gambia.</span>
             </p>
           </div>
 
-          <div className="flex bg-white p-1 rounded-2xl shadow-sm border border-surface-variant/10 self-start">
+          <div className="flex bg-white p-1.5 rounded-[2rem] shadow-2xl shadow-primary/5 border border-surface-variant/10 self-start">
             <button 
               onClick={() => setActiveType('buy')}
-              className={`px-8 py-3 rounded-xl font-bold text-sm transition-all ${
+              className={`px-10 py-4 rounded-[1.5rem] font-black text-sm uppercase tracking-widest transition-all ${
                 activeType === 'buy' 
-                  ? 'bg-primary text-white shadow-lg' 
-                  : 'text-on-surface-variant hover:bg-surface-variant/20'
+                  ? 'bg-primary text-white shadow-xl' 
+                  : 'text-on-surface-variant hover:bg-surface-variant/10'
               }`}
             >
               Buy
             </button>
             <button 
               onClick={() => setActiveType('rent')}
-              className={`px-8 py-3 rounded-xl font-bold text-sm transition-all ${
+              className={`px-10 py-4 rounded-[1.5rem] font-black text-sm uppercase tracking-widest transition-all ${
                 activeType === 'rent' 
-                  ? 'bg-primary text-white shadow-lg' 
-                  : 'text-on-surface-variant hover:bg-surface-variant/20'
+                  ? 'bg-primary text-white shadow-xl' 
+                  : 'text-on-surface-variant hover:bg-surface-variant/10'
               }`}
             >
               Rent
@@ -99,49 +99,53 @@ export const BrowseView: React.FC<BrowseViewProps> = ({
         </div>
 
         {/* Search & Filter Bar */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
-          <div className="lg:col-span-2 relative">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant" />
+        <div className="flex flex-col lg:flex-row gap-4 mb-8">
+          <div className="flex-grow relative group">
+            <div className="absolute left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-2xl bg-primary/5 flex items-center justify-center group-focus-within:bg-primary group-focus-within:text-white transition-all">
+              <Search className="w-5 h-5" />
+            </div>
             <input 
               type="text"
               placeholder="Search by neighborhood, city or property name..."
-              className="w-full bg-white border border-surface-variant/20 rounded-2xl px-14 py-4 focus:ring-2 focus:ring-primary/20 outline-none font-medium shadow-sm"
+              className="w-full bg-white border border-surface-variant/10 rounded-[2rem] pl-20 pr-8 py-6 focus:ring-4 focus:ring-primary/5 outline-none font-bold text-lg shadow-2xl shadow-primary/5 placeholder:text-on-surface-variant/30"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
             />
           </div>
           
-          <button 
-            onClick={() => setShowFilters(!showFilters)}
-            className={`bg-white border border-surface-variant/20 rounded-2xl px-6 py-4 flex items-center justify-center gap-3 font-bold transition-colors shadow-sm ${showFilters ? 'text-secondary border-secondary' : 'text-primary hover:bg-surface-variant/10'}`}
-          >
-            <SlidersHorizontal className="w-5 h-5" />
-            {showFilters ? 'Hide Filters' : 'Show Filters'}
-          </button>
+          <div className="flex gap-4">
+            <button 
+              onClick={() => setShowFilters(!showFilters)}
+              className={`bg-white border border-surface-variant/10 rounded-[2rem] px-8 py-6 flex items-center justify-center gap-3 font-black text-sm uppercase tracking-widest transition-all shadow-2xl shadow-primary/5 ${showFilters ? 'text-secondary border-secondary/30 bg-secondary/5' : 'text-primary hover:bg-surface-variant/5'}`}
+            >
+              <SlidersHorizontal className="w-5 h-5" />
+              {showFilters ? 'Hide' : 'Filters'}
+            </button>
 
-          <div className="flex bg-white p-1 rounded-2xl shadow-sm border border-surface-variant/10">
-            <button 
-              onClick={() => setViewMode('grid')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all ${
-                viewMode === 'grid' 
-                  ? 'bg-secondary text-white shadow-md' 
-                  : 'text-on-surface-variant hover:bg-surface-variant/20'
-              }`}
-            >
-              <LayoutGrid className="w-4 h-4" />
-              Grid
-            </button>
-            <button 
-              onClick={() => setViewMode('map')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all ${
-                viewMode === 'map' 
-                  ? 'bg-secondary text-white shadow-md' 
-                  : 'text-on-surface-variant hover:bg-surface-variant/20'
-              }`}
-            >
-              <MapIcon className="w-4 h-4" />
-              Map
-            </button>
+            <div className="flex bg-white p-1.5 rounded-[2rem] shadow-2xl shadow-primary/5 border border-surface-variant/10">
+              <button 
+                onClick={() => setViewMode('grid')}
+                className={`w-14 h-14 flex items-center justify-center rounded-2xl transition-all ${
+                  viewMode === 'grid' 
+                    ? 'bg-secondary text-white shadow-lg' 
+                    : 'text-on-surface-variant hover:bg-surface-variant/10'
+                }`}
+                title="Grid View"
+              >
+                <LayoutGrid className="w-6 h-6" />
+              </button>
+              <button 
+                onClick={() => setViewMode('map')}
+                className={`w-14 h-14 flex items-center justify-center rounded-2xl transition-all ${
+                  viewMode === 'map' 
+                    ? 'bg-secondary text-white shadow-lg' 
+                    : 'text-on-surface-variant hover:bg-surface-variant/10'
+                }`}
+                title="Map View"
+              >
+                <MapIcon className="w-6 h-6" />
+              </button>
+            </div>
           </div>
         </div>
 
