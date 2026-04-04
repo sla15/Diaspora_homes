@@ -50,9 +50,9 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full bg-background border border-surface-variant/10 rounded-xl px-6 py-4 focus:ring-2 focus:ring-primary/20 outline-none font-bold text-sm flex items-center justify-between hover:bg-surface-variant/5 transition-colors text-left"
+          className="w-full bg-transparent border-none rounded-xl px-0 py-4 focus:ring-0 outline-none font-bold text-lg flex items-center justify-between hover:bg-surface-variant/5 transition-colors text-left"
         >
-          <span className={selectedOption ? 'text-on-surface' : 'text-on-surface-variant/60'}>
+          <span className={selectedOption ? 'text-on-surface' : 'text-on-surface-variant/40'}>
             {selectedOption ? selectedOption.label : placeholder}
           </span>
           <motion.div

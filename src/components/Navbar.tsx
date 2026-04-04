@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Bell, MessageSquare, User, Menu } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface NavbarProps {
   onSellClick: () => void;
@@ -10,6 +10,7 @@ interface NavbarProps {
   currentView: 'home' | 'details' | 'sell' | 'browse';
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  isScrolled?: boolean;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ 
@@ -19,20 +20,32 @@ export const Navbar: React.FC<NavbarProps> = ({
   onRentClick, 
   currentView,
   searchQuery,
-  onSearchChange
+  onSearchChange,
+  isScrolled = false
 }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const navLinks = [
-    { label: 'Home', onClick: onLogoClick, active: currentView === 'home' },
-    { label: 'Buy', onClick: onBuyClick, active: currentView === 'browse' },
-    { label: 'Sell', onClick: onSellClick, active: currentView === 'sell' },
+    { label: 'Home', onClick: () => { onLogoClick(); setIsMenuOpen(false); }, active: currentView === 'home' },
+    { label: 'Buy', onClick: () => { onBuyClick(); setIsMenuOpen(false); }, active: currentView === 'browse' },
+    { label: 'Sell', onClick: () => { onSellClick(); setIsMenuOpen(false); }, active: currentView === 'sell' },
   ];
 
+  const headerStyles = currentView === 'home' 
+    ? (isScrolled 
+        ? "bg-white/90 backdrop-blur-xl border-b border-surface-variant/10 py-4 shadow-lg" 
+        : "bg-transparent border-transparent py-6")
+    : "bg-white/90 backdrop-blur-xl border-b border-surface-variant/10 py-4 shadow-lg";
+
+  const textStyles = currentView === 'home' && !isScrolled ? "text-white" : "text-primary";
+  const navTextStyles = currentView === 'home' && !isScrolled ? "text-white/80 hover:text-white" : "text-on-surface-variant hover:text-primary";
+
   return (
-    <header className="fixed top-0 w-full flex justify-between items-center px-6 py-4 max-w-screen-2xl mx-auto bg-white/80 backdrop-blur-xl z-[9999] border-b border-surface-variant/10">
+    <header className={`fixed top-0 w-full flex justify-between items-center px-6 transition-all duration-500 max-w-screen-2xl mx-auto z-[9999] ${headerStyles}`}>
       <div className="flex items-center">
         <span 
           onClick={onLogoClick}
-          className="text-2xl font-black tracking-tighter text-primary cursor-pointer"
+          className={`text-2xl font-black tracking-tighter cursor-pointer transition-colors ${textStyles}`}
         >
           The Digital Estate
         </span>
@@ -44,14 +57,18 @@ export const Navbar: React.FC<NavbarProps> = ({
             key={link.label}
             onClick={link.onClick} 
             className={`relative py-2 transition-all font-bold text-sm tracking-wide ${
-              link.active ? 'text-primary' : 'text-on-surface-variant hover:text-primary'
+              link.active 
+                ? (currentView === 'home' && !isScrolled ? 'text-white' : 'text-primary') 
+                : navTextStyles
             }`}
           >
             {link.label}
             {link.active && (
               <motion.div 
                 layoutId="activeNav"
-                className="absolute -bottom-1 left-0 right-0 h-1 bg-secondary rounded-full"
+                className={`absolute -bottom-1 left-0 right-0 h-1 rounded-full ${
+                  currentView === 'home' && !isScrolled ? 'bg-white' : 'bg-secondary'
+                }`}
               />
             )}
           </button>
@@ -59,10 +76,16 @@ export const Navbar: React.FC<NavbarProps> = ({
       </nav>
       
       <div className="flex items-center gap-4">
-        <div className="hidden md:flex bg-background rounded-full px-4 py-2 items-center gap-2 border border-surface-variant/20">
-          <Search className="w-4 h-4 text-on-surface-variant" />
+        <div className={`hidden md:flex rounded-full px-4 py-2 items-center gap-2 border transition-all ${
+          currentView === 'home' && !isScrolled 
+            ? 'bg-white/10 border-white/20' 
+            : 'bg-background border-surface-variant/20'
+        }`}>
+          <Search className={`w-4 h-4 ${currentView === 'home' && !isScrolled ? 'text-white/60' : 'text-on-surface-variant'}`} />
           <input 
-            className="bg-transparent border-none focus:ring-0 text-sm w-48 font-sans outline-none" 
+            className={`bg-transparent border-none focus:ring-0 text-sm w-48 font-sans outline-none ${
+              currentView === 'home' && !isScrolled ? 'text-white placeholder:text-white/40' : 'text-on-surface'
+            }`} 
             placeholder="Search properties..." 
             type="text"
             value={searchQuery}
@@ -76,11 +99,58 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
         
         <div className="flex gap-1">
-          <button className="md:hidden p-2 rounded-full hover:bg-surface-variant/30 transition-all">
-            <Menu className="w-5 h-5 text-on-surface-variant" />
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className={`md:hidden p-2 rounded-full transition-all ${
+              currentView === 'home' && !isScrolled 
+                ? 'hover:bg-white/10' 
+                : 'hover:bg-surface-variant/30'
+            }`}
+          >
+            <Menu className={`w-5 h-5 ${currentView === 'home' && !isScrolled ? 'text-white' : 'text-on-surface-variant'}`} />
           </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="absolute top-full left-0 right-0 bg-white border-b border-surface-variant/10 p-6 flex flex-col gap-4 md:hidden shadow-2xl"
+          >
+            {navLinks.map((link) => (
+              <button
+                key={link.label}
+                onClick={link.onClick}
+                className={`text-left py-4 font-bold text-lg border-b border-surface-variant/5 last:border-none ${
+                  link.active ? 'text-primary' : 'text-on-surface-variant'
+                }`}
+              >
+                {link.label}
+              </button>
+            ))}
+            <div className="bg-background rounded-2xl px-4 py-4 flex items-center gap-3 border border-surface-variant/20 mt-2">
+              <Search className="w-5 h-5 text-on-surface-variant" />
+              <input 
+                className="bg-transparent border-none focus:ring-0 text-base w-full font-sans outline-none" 
+                placeholder="Search properties..." 
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  onSearchChange(e.target.value);
+                  if (currentView !== 'browse' && e.target.value.length > 0) {
+                    onBuyClick();
+                    setIsMenuOpen(false);
+                  }
+                }}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };

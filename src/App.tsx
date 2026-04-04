@@ -43,6 +43,15 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [heroPropertyType, setHeroPropertyType] = useState('');
   const [isSellerLoggedIn, setIsSellerLoggedIn] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const propertyTypeOptions = [
     { value: 'villa', label: 'Villa' },
@@ -86,10 +95,11 @@ export default function App() {
           currentView={view}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
+          isScrolled={isScrolled}
         />
       )}
       
-      <main className={!(view === 'sell' && isSellerLoggedIn) ? "pt-24" : ""}>
+      <main className={!(view === 'sell' && isSellerLoggedIn) ? (view === 'home' ? "" : "pt-24") : ""}>
         <AnimatePresence mode="wait">
           {view === 'home' ? (
             <motion.div 
@@ -99,52 +109,68 @@ export default function App() {
               exit={{ opacity: 0 }}
             >
               {/* Hero Section */}
-              <section className="px-6 mb-16 max-w-7xl mx-auto">
-                <div className="relative h-[500px] md:h-[600px] rounded-[2.5rem] overflow-hidden flex items-center justify-center">
-                  <img 
-                    className="absolute inset-0 w-full h-full object-cover brightness-75" 
-                    src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop" 
-                    alt="Luxury Villa"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="relative z-10 text-center px-4 w-full max-w-3xl">
-                    <h1 className="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-8 leading-[1.1] font-headline">
-                      Find your piece of <span className="text-secondary">The Gambia.</span>
+              <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden mb-24">
+                <img 
+                  className="absolute inset-0 w-full h-full object-cover brightness-[0.65]" 
+                  src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop" 
+                  alt="Luxury Villa"
+                  referrerPolicy="no-referrer"
+                />
+                
+                <div className="relative z-10 text-center px-6 w-full max-w-5xl mx-auto">
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                  >
+                    <h1 className="text-5xl md:text-8xl font-black text-white tracking-tighter mb-12 leading-[0.9] font-headline">
+                      Find your piece of <br/>
+                      <span className="text-secondary italic">The Gambia.</span>
                     </h1>
+                  </motion.div>
+                  
+                  {/* Search Bar */}
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+                    className="bg-white/95 backdrop-blur-md p-3 md:p-4 rounded-[2rem] md:rounded-full shadow-2xl flex flex-col md:flex-row items-stretch md:items-center gap-3 border border-white/20 max-w-4xl mx-auto"
+                  >
+                    <div className="flex-1 flex items-center gap-4 px-6 py-2 md:py-0 border-b md:border-b-0 md:border-r border-surface-variant/10">
+                      <Search className="w-6 h-6 text-primary" />
+                      <input 
+                        className="w-full bg-transparent border-none focus:ring-0 text-on-surface font-bold py-4 outline-none text-lg placeholder:text-on-surface-variant/40" 
+                        placeholder="Search by neighborhood..." 
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                    </div>
                     
-                    {/* Search Bar */}
-                    <div className="bg-white p-2 rounded-full shadow-2xl flex flex-col md:flex-row items-center gap-2 border border-white/20">
-                      <div className="flex-1 flex items-center gap-3 px-6 w-full">
-                        <Search className="w-5 h-5 text-on-surface-variant" />
-                        <input 
-                          className="w-full bg-transparent border-none focus:ring-0 text-on-surface font-medium py-4 outline-none" 
-                          placeholder="Search by neighborhood or city..." 
-                          type="text"
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
+                    <div className="flex-1 flex items-center gap-4 px-6 py-2 md:py-0">
+                      <Home className="w-6 h-6 text-primary" />
+                      <div className="w-full">
+                        <CustomDropdown
+                          options={propertyTypeOptions}
+                          value={heroPropertyType}
+                          onChange={setHeroPropertyType}
+                          placeholder="Property Type"
+                          className="w-full border-none !bg-transparent"
                         />
                       </div>
-                      <div className="hidden md:block h-8 w-[1px] bg-surface-variant/30"></div>
-                      <div className="flex-1 flex items-center gap-3 px-6 w-full relative group">
-                        <Home className="w-5 h-5 text-on-surface-variant group-focus-within:text-primary transition-colors" />
-                        <div className="w-full">
-                          <CustomDropdown
-                            options={propertyTypeOptions}
-                            value={heroPropertyType}
-                            onChange={setHeroPropertyType}
-                            placeholder="Property Type"
-                            className="w-full"
-                          />
-                        </div>
-                      </div>
-                      <button 
-                        onClick={() => handleBrowse('buy')}
-                        className="bg-primary text-white px-10 py-4 rounded-full font-bold hover:scale-[1.02] transition-transform w-full md:w-auto"
-                      >
-                        Search
-                      </button>
                     </div>
-                  </div>
+                    
+                    <button 
+                      onClick={() => handleBrowse('buy')}
+                      className="bg-primary text-white px-12 py-5 rounded-2xl md:rounded-full font-black text-lg hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-primary/20"
+                    >
+                      Search
+                    </button>
+                  </motion.div>
+                </div>
+
+                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 animate-bounce hidden md:block">
+                  <ChevronDown className="w-8 h-8 text-white/50" />
                 </div>
               </section>
 
