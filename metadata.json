@@ -1,0 +1,5 @@
+{
+  "name": "The Digital Estate",
+  "description": "A premium real estate discovery platform for luxury properties in The Gambia.",
+  "requestFramePermissions": ["geolocation"]
+}
