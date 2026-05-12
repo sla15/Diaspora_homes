@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { PropertyCard } from './PropertyCard';
-import { Property, PROPERTIES } from '../types';
-import { Search, SlidersHorizontal, Map as MapIcon, LayoutGrid, ChevronDown } from 'lucide-react';
+import { Property, PROPERTIES, CurrencyCode, COMMON_AMENITIES } from '../types';
+import { Search, SlidersHorizontal, Map as MapIcon, LayoutGrid, ChevronDown, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { GambiaMap } from './GambiaMap';
+import { PropertyMap } from './PropertyMap';
+import { displayPrice } from '../lib/currency';
 
 import { CustomDropdown } from './CustomDropdown';
 
@@ -15,6 +16,7 @@ interface BrowseViewProps {
   propertyType: string;
   onPropertyTypeChange: (type: string) => void;
   properties: Property[];
+  selectedCurrency: CurrencyCode;
 }
 
 export const BrowseView: React.FC<BrowseViewProps> = ({ 
@@ -24,13 +26,15 @@ export const BrowseView: React.FC<BrowseViewProps> = ({
   onSearchChange,
   propertyType,
   onPropertyTypeChange,
-  properties
+  properties,
+  selectedCurrency
 }) => {
   const [activeType, setActiveType] = useState<'buy' | 'rent'>(initialType);
   const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000000]);
   const [bedrooms, setBedrooms] = useState<string>('any');
   const [bathrooms, setBathrooms] = useState<string>('any');
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
 
   const propertyTypeOptions = [
@@ -55,10 +59,12 @@ export const BrowseView: React.FC<BrowseViewProps> = ({
       const matchesBathrooms = bathrooms === 'any' || 
                               (bathrooms === '4' ? prop.bathrooms >= 4 : prop.bathrooms === parseInt(bathrooms));
       const matchesPropertyType = propertyType === 'any' || propertyType === '' || prop.propertyType === propertyType;
+      const matchesAmenities = selectedAmenities.length === 0 || 
+                              selectedAmenities.every(amenity => prop.features.includes(amenity));
 
-      return matchesType && matchesSearch && matchesPrice && matchesBedrooms && matchesBathrooms && matchesPropertyType;
+      return matchesType && matchesSearch && matchesPrice && matchesBedrooms && matchesBathrooms && matchesPropertyType && matchesAmenities;
     });
-  }, [activeType, searchQuery, priceRange, bedrooms, bathrooms, propertyType]);
+  }, [activeType, searchQuery, priceRange, bedrooms, bathrooms, propertyType, selectedAmenities]);
 
   return (
     <div className="min-h-screen bg-background pt-12 pb-24">
@@ -70,7 +76,7 @@ export const BrowseView: React.FC<BrowseViewProps> = ({
               {activeType === 'buy' ? 'Properties for Sale' : 'Properties for Rent'}
             </h1>
             <p className="text-lg text-on-surface-variant font-bold">
-              Discover {filteredProperties.length} verified listings in <span className="text-secondary italic">The Gambia.</span>
+              Discover {filteredProperties.length} verified listings <span className="text-secondary italic">Globally.</span>
             </p>
           </div>
 
@@ -113,14 +119,27 @@ export const BrowseView: React.FC<BrowseViewProps> = ({
             />
           </div>
           
-          <div className="flex gap-4">
-            <button 
-              onClick={() => setShowFilters(!showFilters)}
-              className={`bg-white border border-surface-variant/10 rounded-[2rem] px-8 py-6 flex items-center justify-center gap-3 font-black text-sm uppercase tracking-widest transition-all shadow-2xl shadow-primary/5 ${showFilters ? 'text-secondary border-secondary/30 bg-secondary/5' : 'text-primary hover:bg-surface-variant/5'}`}
-            >
-              <SlidersHorizontal className="w-5 h-5" />
-              {showFilters ? 'Hide' : 'Filters'}
-            </button>
+            <div className="flex gap-4">
+              <button 
+                onClick={() => {
+                  setPriceRange([0, 100000000]);
+                  setBedrooms('any');
+                  setBathrooms('any');
+                  setSelectedAmenities([]);
+                  onPropertyTypeChange('any');
+                }}
+                className="bg-white border border-surface-variant/10 rounded-[2rem] px-6 py-6 flex items-center justify-center text-on-surface-variant hover:text-primary transition-all shadow-2xl shadow-primary/5 font-bold text-sm uppercase tracking-widest"
+                title="Clear All Filters"
+              >
+                Clear
+              </button>
+              <button 
+                onClick={() => setShowFilters(!showFilters)}
+                className={`bg-white border border-surface-variant/10 rounded-[2rem] px-8 py-6 flex items-center justify-center gap-3 font-black text-sm uppercase tracking-widest transition-all shadow-2xl shadow-primary/5 ${showFilters ? 'text-secondary border-secondary/30 bg-secondary/5' : 'text-primary hover:bg-surface-variant/5'}`}
+              >
+                <SlidersHorizontal className="w-5 h-5" />
+                {showFilters ? 'Hide' : 'Filters'}
+              </button>
 
             <div className="flex bg-white p-1.5 rounded-[2rem] shadow-2xl shadow-primary/5 border border-surface-variant/10">
               <button 
@@ -206,6 +225,44 @@ export const BrowseView: React.FC<BrowseViewProps> = ({
                   </div>
                 </div>
               </div>
+
+              {/* Amenities Filter */}
+              <div className="mt-8 pt-8 border-t border-surface-variant/10">
+                <div className="flex items-center justify-between mb-6">
+                  <label className="text-xs font-black uppercase tracking-widest text-on-surface-variant ml-1">Amenities</label>
+                  {selectedAmenities.length > 0 && (
+                    <button 
+                      onClick={() => setSelectedAmenities([])}
+                      className="text-[10px] font-black uppercase tracking-widest text-secondary hover:underline"
+                    >
+                      Clear Amenities
+                    </button>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  {COMMON_AMENITIES.map((amenity) => {
+                    const isSelected = selectedAmenities.includes(amenity);
+                    return (
+                      <button
+                        key={amenity}
+                        onClick={() => {
+                          setSelectedAmenities(prev => 
+                            isSelected ? prev.filter(a => a !== amenity) : [...prev, amenity]
+                          );
+                        }}
+                        className={`flex items-center gap-2 px-5 py-3 rounded-full border transition-all text-left ${
+                          isSelected 
+                            ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20' 
+                            : 'bg-white border-surface-variant/10 text-on-surface-variant hover:border-primary/30'
+                        }`}
+                      >
+                        {isSelected && <Check className="w-3.5 h-3.5" />}
+                        <span className="text-sm font-bold">{amenity}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -226,6 +283,7 @@ export const BrowseView: React.FC<BrowseViewProps> = ({
                     key={prop.id}
                     property={prop}
                     onClick={() => onPropertyClick(prop)}
+                    selectedCurrency={selectedCurrency}
                   />
                 ))
               ) : (
@@ -248,7 +306,7 @@ export const BrowseView: React.FC<BrowseViewProps> = ({
               exit={{ opacity: 0, scale: 0.95 }}
               className="h-[700px] rounded-[2.5rem] overflow-hidden shadow-2xl border border-surface-variant/10 relative"
             >
-              <GambiaMap 
+              <PropertyMap 
                 center={[13.4432, -16.6466]} 
                 zoom={11} 
                 showSearch={false}
@@ -256,7 +314,7 @@ export const BrowseView: React.FC<BrowseViewProps> = ({
                   position: p.coordinates,
                   title: p.title,
                   type: 'property',
-                  price: `${p.currency} ${p.price.toLocaleString()}`,
+                  price: displayPrice(p.price, selectedCurrency),
                   image: p.images[0],
                   description: p.location
                 }))}

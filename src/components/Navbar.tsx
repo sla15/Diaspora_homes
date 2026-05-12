@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Search, Bell, MessageSquare, User, Menu } from 'lucide-react';
+import { Search, Bell, MessageSquare, User, Menu, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { CURRENCIES, CurrencyCode } from '../types';
 
 interface NavbarProps {
   onSellClick: () => void;
@@ -11,6 +12,8 @@ interface NavbarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   isScrolled?: boolean;
+  selectedCurrency: CurrencyCode;
+  onCurrencyChange: (currency: CurrencyCode) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ 
@@ -21,9 +24,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   currentView,
   searchQuery,
   onSearchChange,
-  isScrolled = false
+  isScrolled = false,
+  selectedCurrency,
+  onCurrencyChange
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
 
   const navLinks = [
     { label: 'Home', onClick: () => { onLogoClick(); setIsMenuOpen(false); }, active: currentView === 'home' },
@@ -76,6 +82,50 @@ export const Navbar: React.FC<NavbarProps> = ({
       </nav>
       
       <div className="flex items-center gap-4">
+        {/* Currency Selector */}
+        <div className="relative">
+          <button 
+            onClick={() => setIsCurrencyOpen(!isCurrencyOpen)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-full transition-all border font-bold text-xs ${
+              currentView === 'home' && !isScrolled 
+                ? 'bg-white/10 border-white/20 text-white hover:bg-white/20' 
+                : 'bg-background border-surface-variant/20 text-primary hover:bg-surface-variant/10'
+            }`}
+          >
+            <Globe className="w-3.5 h-3.5" />
+            {selectedCurrency}
+          </button>
+
+          <AnimatePresence>
+            {isCurrencyOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-surface-variant/10 p-2 z-[10000] max-h-[400px] overflow-y-auto custom-scrollbar"
+                >
+                {CURRENCIES.map((currency) => (
+                  <button
+                    key={currency.code}
+                    onClick={() => {
+                      onCurrencyChange(currency.code);
+                      setIsCurrencyOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                      selectedCurrency === currency.code 
+                        ? 'bg-primary text-white shadow-lg' 
+                        : 'text-on-surface-variant hover:bg-surface-variant/10'
+                    }`}
+                  >
+                    <span>{currency.label}</span>
+                    <span className="opacity-60">{currency.symbol}</span>
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
         <div className={`hidden md:flex rounded-full px-4 py-2 items-center gap-2 border transition-all ${
           currentView === 'home' && !isScrolled 
             ? 'bg-white/10 border-white/20' 

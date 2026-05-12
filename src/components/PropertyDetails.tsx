@@ -1,15 +1,17 @@
 import React from 'react';
-import { Property } from '../types';
+import { Property, CurrencyCode } from '../types';
 import { ArrowLeft, MapPin, Bed, Bath, Square, Car, Waves, Zap, Shield, Wine, Star, Mail, CreditCard, Calendar, TrendingUp, Instagram, Facebook, Linkedin, Twitter, Globe, MessageCircle } from 'lucide-react';
 import { motion } from 'motion/react';
-import { GambiaMap } from './GambiaMap';
+import { PropertyMap } from './PropertyMap';
+import { displayPrice } from '../lib/currency';
 
 interface PropertyDetailsProps {
   property: Property;
   onBack: () => void;
+  selectedCurrency: CurrencyCode;
 }
 
-export const PropertyDetails: React.FC<PropertyDetailsProps> = ({ property, onBack }) => {
+export const PropertyDetails: React.FC<PropertyDetailsProps> = ({ property, onBack, selectedCurrency }) => {
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -101,7 +103,7 @@ export const PropertyDetails: React.FC<PropertyDetailsProps> = ({ property, onBa
               <div className="bg-secondary/5 px-8 py-4 rounded-3xl border border-secondary/10">
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary mb-1">Asking Price</p>
                 <p className="text-4xl font-black text-secondary tracking-tight">
-                  D {property.price.toLocaleString()}
+                  {displayPrice(property.price, selectedCurrency)}
                 </p>
               </div>
             </div>
@@ -164,7 +166,7 @@ export const PropertyDetails: React.FC<PropertyDetailsProps> = ({ property, onBa
           <div className="space-y-6">
             <h2 className="text-3xl font-black text-primary tracking-tight">The Neighborhood</h2>
             <div className="h-[500px] w-full rounded-[2.5rem] overflow-hidden relative shadow-2xl border-4 border-white">
-              <GambiaMap 
+              <PropertyMap 
                 center={property.coordinates} 
                 markers={[{ position: property.coordinates, title: property.title }]} 
               />

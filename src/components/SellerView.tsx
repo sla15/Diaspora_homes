@@ -90,6 +90,7 @@ export const SellerView: React.FC<SellerViewProps> = ({ onBack, isLoggedIn, setI
     propertyType: 'villa' as Property['propertyType'],
     listingType: 'buy' as 'buy' | 'rent',
     price: '',
+    currency: 'GMD' as Property['currency'],
     duration: 'full' as Property['duration'],
     location: '',
     bedrooms: '',
@@ -114,6 +115,7 @@ export const SellerView: React.FC<SellerViewProps> = ({ onBack, isLoggedIn, setI
       propertyType: listing.propertyType,
       listingType: listing.type,
       price: listing.price.toString(),
+      currency: listing.currency || 'GMD',
       duration: listing.duration || 'full',
       location: listing.location,
       bedrooms: listing.bedrooms.toString(),
@@ -161,6 +163,7 @@ export const SellerView: React.FC<SellerViewProps> = ({ onBack, isLoggedIn, setI
         propertyType: listingFormData.propertyType,
         type: listingFormData.listingType,
         price: priceNum,
+        currency: listingFormData.currency,
         duration: listingFormData.duration,
         location: listingFormData.location,
         bedrooms: bedroomsNum,
@@ -181,7 +184,7 @@ export const SellerView: React.FC<SellerViewProps> = ({ onBack, isLoggedIn, setI
         propertyType: listingFormData.propertyType,
         type: listingFormData.listingType,
         price: priceNum,
-        currency: "D",
+        currency: listingFormData.currency,
         duration: listingFormData.duration,
         location: listingFormData.location,
         bedrooms: bedroomsNum,
@@ -216,6 +219,7 @@ export const SellerView: React.FC<SellerViewProps> = ({ onBack, isLoggedIn, setI
       propertyType: 'villa',
       listingType: 'buy',
       price: '',
+      currency: 'GMD',
       duration: 'full',
       location: '',
       bedrooms: '',
@@ -292,7 +296,7 @@ export const SellerView: React.FC<SellerViewProps> = ({ onBack, isLoggedIn, setI
               <span className="text-secondary">The Digital Estate.</span>
             </h1>
             <p className="text-xl text-on-surface-variant leading-relaxed max-w-lg mb-8">
-              Join Gambia's top real estate network. Reach buyers and manage your listings easily.
+              Join the world's top real estate network. Reach buyers and manage your listings easily.
             </p>
             
             <div className="space-y-6">
@@ -457,6 +461,7 @@ export const SellerView: React.FC<SellerViewProps> = ({ onBack, isLoggedIn, setI
                         propertyType: 'villa',
                         listingType: 'buy',
                         price: '',
+                        currency: 'GMD',
                         duration: 'full',
                         location: '',
                         bedrooms: '',
@@ -532,8 +537,21 @@ export const SellerView: React.FC<SellerViewProps> = ({ onBack, isLoggedIn, setI
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant ml-1">Price & Payment Plan</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant ml-1">Price & Currency</label>
                     <div className="flex gap-2">
+                      <div className="relative min-w-[100px]">
+                        <CustomDropdown
+                          options={[
+                            { value: 'GMD', label: 'GMD (D)' },
+                            { value: 'USD', label: 'USD ($)' },
+                            { value: 'EUR', label: 'EUR (€)' },
+                            { value: 'GBP', label: 'GBP (£)' },
+                            { value: 'XOF', label: 'CFA' },
+                          ]}
+                          value={listingFormData.currency}
+                          onChange={(val) => setListingFormData({...listingFormData, currency: val as Property['currency']})}
+                        />
+                      </div>
                       <div className="relative flex-1">
                         <input 
                           type="text" 
@@ -546,22 +564,24 @@ export const SellerView: React.FC<SellerViewProps> = ({ onBack, isLoggedIn, setI
                             setListingFormData({...listingFormData, price: formatted});
                           }}
                         />
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 font-bold text-xs">D</span>
                       </div>
-                      <div className="relative min-w-[140px]">
-                        <CustomDropdown
-                          options={[
-                            { value: 'full', label: 'Full Amount' },
-                            { value: 'daily', label: 'Daily' },
-                            { value: 'weekly', label: 'Weekly' },
-                            { value: 'monthly', label: 'Monthly' },
-                            { value: 'six-months', label: 'Every 6 Months' },
-                            { value: 'yearly', label: 'Yearly' },
-                          ]}
-                          value={listingFormData.duration}
-                          onChange={(val) => setListingFormData({...listingFormData, duration: val as Property['duration']})}
-                        />
-                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant ml-1">Payment Plan</label>
+                    <div className="relative w-full">
+                      <CustomDropdown
+                        options={[
+                          { value: 'full', label: 'Full Amount' },
+                          { value: 'daily', label: 'Daily' },
+                          { value: 'weekly', label: 'Weekly' },
+                          { value: 'monthly', label: 'Monthly' },
+                          { value: 'six-months', label: 'Every 6 Months' },
+                          { value: 'yearly', label: 'Yearly' },
+                        ]}
+                        value={listingFormData.duration}
+                        onChange={(val) => setListingFormData({...listingFormData, duration: val as Property['duration']})}
+                      />
                     </div>
                   </div>
                   

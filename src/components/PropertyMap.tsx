@@ -28,7 +28,7 @@ function ChangeView({ center, zoom }: { center: [number, number], zoom: number }
   return null;
 }
 
-interface GambiaMapProps {
+interface PropertyMapProps {
   center: [number, number];
   zoom?: number;
   markers?: { 
@@ -42,7 +42,7 @@ interface GambiaMapProps {
   showSearch?: boolean;
 }
 
-export const GambiaMap: React.FC<GambiaMapProps> = ({ 
+export const PropertyMap: React.FC<PropertyMapProps> = ({ 
   center: initialCenter, 
   zoom: initialZoom = 13, 
   markers: initialMarkers = [],
@@ -142,7 +142,7 @@ export const GambiaMap: React.FC<GambiaMapProps> = ({
                     <h4 className="font-black text-primary text-xs truncate">{marker.title}</h4>
                     <div className="flex items-center gap-1 mt-1">
                       <MapPin className="w-3 h-3 text-secondary" />
-                      <span className="text-[10px] text-on-surface-variant font-medium truncate">{marker.description || 'Gambia'}</span>
+                      <span className="text-[10px] text-on-surface-variant font-medium truncate">{marker.description || 'Location'}</span>
                     </div>
                   </div>
                 </div>

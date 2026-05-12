@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { PropertyCard } from './components/PropertyCard';
 import { PropertyDetails } from './components/PropertyDetails';
-import { GambiaMap } from './components/GambiaMap';
+import { PropertyMap } from './components/PropertyMap';
 import { SellerView } from './components/SellerView';
 import { BrowseView } from './components/BrowseView';
-import { PROPERTIES, Property } from './types';
+import { PROPERTIES, Property, CURRENCIES, CurrencyCode } from './types';
 import { Search, Home, SlidersHorizontal, CreditCard, TrendingUp, Mail, User, ArrowRight, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useEffect } from 'react';
@@ -44,6 +44,7 @@ export default function App() {
   const [heroPropertyType, setHeroPropertyType] = useState('');
   const [isSellerLoggedIn, setIsSellerLoggedIn] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('GMD');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -96,6 +97,8 @@ export default function App() {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           isScrolled={isScrolled}
+          selectedCurrency={selectedCurrency}
+          onCurrencyChange={setSelectedCurrency}
         />
       )}
       
@@ -125,7 +128,7 @@ export default function App() {
                   >
                     <h1 className="text-5xl md:text-8xl font-black text-white tracking-tighter mb-12 leading-[0.9] font-headline">
                       Find your piece of <br/>
-                      <span className="text-secondary italic">The Gambia.</span>
+                      <span className="text-secondary italic">The World.</span>
                     </h1>
                   </motion.div>
                   
@@ -234,6 +237,7 @@ export default function App() {
                       property={prop} 
                       featured={idx === 0}
                       onClick={() => handlePropertySelect(prop)}
+                      selectedCurrency={selectedCurrency}
                     />
                   ))}
                   
@@ -250,11 +254,11 @@ export default function App() {
               {/* Explore Section */}
               <section className="mt-24 px-6 max-w-7xl mx-auto">
                 <div className="mb-12">
-                  <h2 className="text-4xl font-extrabold text-primary tracking-tight mb-4">Explore The Gambia</h2>
-                  <p className="text-on-surface-variant text-lg max-w-2xl">Discover landmarks, markets, and natural wonders across the Smiling Coast. Use our interactive map to find points of interest near your future home.</p>
+                  <h2 className="text-4xl font-extrabold text-primary tracking-tight mb-4">Explore Global Destinations</h2>
+                  <p className="text-on-surface-variant text-lg max-w-2xl">Discover landmarks, markets, and natural wonders across the world. Use our interactive map to find points of interest near your future home.</p>
                 </div>
                 <div className="h-[600px] rounded-[2.5rem] overflow-hidden shadow-2xl border border-surface-variant/10 relative">
-                  <GambiaMap 
+                  <PropertyMap 
                     center={[13.4432, -16.6466]} 
                     zoom={11} 
                     showSearch={true}
@@ -275,14 +279,14 @@ export default function App() {
                       <Home className="w-6 h-6" />
                     </div>
                     <h3 className="text-3xl font-bold mb-4">Verified Listings</h3>
-                    <p className="text-surface-variant font-medium leading-relaxed">Every property in The Digital Estate undergoes a rigorous legal and structural verification process by local Gambian experts.</p>
+                    <p className="text-surface-variant font-medium leading-relaxed">Every property in The Digital Estate undergoes a rigorous legal and structural verification process by local experts.</p>
                   </div>
                   <div className="p-10 bg-secondary rounded-[2.5rem] text-white">
                     <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mb-6">
                       <Mail className="w-6 h-6" />
                     </div>
                     <h3 className="text-3xl font-bold mb-4">Legal Support</h3>
-                    <p className="text-surface-variant font-medium leading-relaxed">Our legal team ensures all property transfers are fully compliant with Gambian land laws, providing peace of mind for global investors.</p>
+                    <p className="text-surface-variant font-medium leading-relaxed">Our legal team ensures all property transfers are fully compliant with local land laws, providing peace of mind for global investors.</p>
                   </div>
                   <div className="p-10 bg-white rounded-[2.5rem] text-primary border border-surface-variant/20">
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-6">
@@ -304,12 +308,14 @@ export default function App() {
               propertyType={heroPropertyType}
               onPropertyTypeChange={setHeroPropertyType}
               properties={properties}
+              selectedCurrency={selectedCurrency}
             />
           ) : view === 'details' && selectedProperty ? (
             <PropertyDetails 
               key="details"
               property={selectedProperty} 
               onBack={handleBackToHome} 
+              selectedCurrency={selectedCurrency}
             />
           ) : (
             <SellerView 
@@ -332,7 +338,7 @@ export default function App() {
               <div className="space-y-6">
                 <div className="font-black text-3xl tracking-tighter">The Digital Estate</div>
                 <p className="text-surface-variant/60 max-w-sm leading-relaxed text-lg">
-                  The Smiling Coast's premier digital real estate platform. We connect global investors with verified Gambian properties.
+                  The world's premier digital real estate platform. We connect global investors with verified properties.
                 </p>
                 <div className="flex gap-4">
                   <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-secondary transition-colors">
@@ -362,7 +368,7 @@ export default function App() {
             </div>
             
             <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-              <p className="text-surface-variant/40 text-xs font-bold uppercase tracking-widest">© 2024 The Digital Estate. Built with pride for The Gambia.</p>
+              <p className="text-surface-variant/40 text-xs font-bold uppercase tracking-widest">© 2024 The Digital Estate. Built with pride for the World.</p>
             </div>
           </div>
         </footer>

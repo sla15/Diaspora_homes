@@ -1,3 +1,53 @@
+export type CurrencyCode = 'GMD' | 'USD' | 'EUR' | 'GBP' | 'XOF' | 'CAD' | 'AUD' | 'JPY' | 'CNY' | 'CHF' | 'INR' | 'ZAR' | 'NGN' | 'BRL' | 'RUB' | 'KRW' | 'MXN' | 'AED' | 'SAR' | 'TRY';
+
+export interface Currency {
+  code: CurrencyCode;
+  symbol: string;
+  label: string;
+  rate: number; // Rate relative to GMD (Dalasi)
+}
+
+export const CURRENCIES: Currency[] = [
+  { code: 'GMD', symbol: 'D', label: 'Gambian Dalasi', rate: 1 },
+  { code: 'USD', symbol: '$', label: 'US Dollar', rate: 0.015 },
+  { code: 'EUR', symbol: '€', label: 'Euro', rate: 0.014 },
+  { code: 'GBP', symbol: '£', label: 'British Pound', rate: 0.012 },
+  { code: 'XOF', symbol: 'CFA', label: 'West African CFA', rate: 9.15 },
+  { code: 'CAD', symbol: 'CA$', label: 'Canadian Dollar', rate: 0.020 },
+  { code: 'AUD', symbol: 'A$', label: 'Australian Dollar', rate: 0.023 },
+  { code: 'JPY', symbol: '¥', label: 'Japanese Yen', rate: 2.25 },
+  { code: 'CNY', symbol: '¥', label: 'Chinese Yuan', rate: 0.11 },
+  { code: 'CHF', symbol: 'Fr', label: 'Swiss Franc', rate: 0.013 },
+  { code: 'INR', symbol: '₹', label: 'Indian Rupee', rate: 1.25 },
+  { code: 'ZAR', symbol: 'R', label: 'South African Rand', rate: 0.28 },
+  { code: 'NGN', symbol: '₦', label: 'Nigerian Naira', rate: 22.5 },
+  { code: 'BRL', symbol: 'R$', label: 'Brazilian Real', rate: 0.075 },
+  { code: 'RUB', symbol: '₽', label: 'Russian Ruble', rate: 1.40 },
+  { code: 'KRW', symbol: '₩', label: 'South Korean Won', rate: 20.2 },
+  { code: 'MXN', symbol: '$', label: 'Mexican Peso', rate: 0.25 },
+  { code: 'AED', symbol: 'د.إ', label: 'UAE Dirham', rate: 0.055 },
+  { code: 'SAR', symbol: '﷼', label: 'Saudi Riyal', rate: 0.056 },
+  { code: 'TRY', symbol: '₺', label: 'Turkish Lira', rate: 0.48 },
+];
+
+export const COMMON_AMENITIES = [
+  'Pool',
+  'Solar Array',
+  'Security',
+  'Gym',
+  'Parking',
+  'Modern Kitchen',
+  'Balcony',
+  'Beachfront',
+  'Eco-friendly',
+  'Private Garden',
+  'Furnished',
+  'Smart Home',
+  'Ocean View',
+  'Wine Cellar',
+  'AC'
+];
+
 export interface Property {
   id: string;
   title: string;
@@ -119,10 +169,12 @@ export const PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=1974&auto=format&fit=crop"
     ],
     features: [
-      "Infinity Edge Pool",
-      "Full Solar Array",
-      "Advanced Security",
-      "Private Wine Cellar"
+      "Pool",
+      "Solar Array",
+      "Security",
+      "Wine Cellar",
+      "Gym",
+      "Ocean View"
     ],
     agent: {
       name: "Mustapha Bah",
@@ -151,7 +203,7 @@ export const PROPERTIES: Property[] = [
     parking: 1,
     description: "Stylish boutique apartment interior in Kotu, contemporary African art on walls, soft neutral tones, evening lighting.",
     images: ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2070&auto=format&fit=crop"],
-    features: ["Prime Location", "Modern Kitchen", "Balcony"],
+    features: ["Pool", "Modern Kitchen", "Balcony", "Security"],
     agent: {
       name: "Fatou Jallow",
       role: "Senior Consultant",
@@ -176,7 +228,7 @@ export const PROPERTIES: Property[] = [
     parking: 2,
     description: "Minimalist pool house in Sanyang, white walls, turquoise water, palm tree shadows, bright sunny day.",
     images: ["https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=2070&auto=format&fit=crop"],
-    features: ["Beachfront", "Eco-friendly", "Private Garden"],
+    features: ["Beachfront", "Eco-friendly", "Private Garden", "Solar Array"],
     agent: {
       name: "Ebrima Sowe",
       role: "Property Manager",
@@ -201,7 +253,7 @@ export const PROPERTIES: Property[] = [
     parking: 1,
     description: "Modern 2-bedroom apartment in the heart of Fajara. Close to all amenities and the beach.",
     images: ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1980&auto=format&fit=crop"],
-    features: ["Central Location", "24/7 Security", "Furnished"],
+    features: ["Security", "Furnished", "Balcony", "AC"],
     agent: {
       name: "Fatou Jallow",
       role: "Senior Consultant",

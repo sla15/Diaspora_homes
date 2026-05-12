@@ -1,15 +1,17 @@
 import React from 'react';
-import { Property } from '../types';
+import { Property, CurrencyCode } from '../types';
 import { Bed, Bath, Square, MapPin } from 'lucide-react';
 import { motion } from 'motion/react';
+import { displayPrice } from '../lib/currency';
 
 interface PropertyCardProps {
   property: Property;
   onClick: () => void;
   featured?: boolean;
+  selectedCurrency: CurrencyCode;
 }
 
-export const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, featured }) => {
+export const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, featured, selectedCurrency }) => {
   if (featured) {
     return (
       <motion.div 
@@ -41,7 +43,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, f
                 </div>
                 <div className="text-right text-white">
                   <p className="text-[10px] font-black uppercase tracking-widest text-secondary mb-1">Price</p>
-                  <p className="text-3xl font-black">D {property.price.toLocaleString()}</p>
+                  <p className="text-3xl font-black">{displayPrice(property.price, selectedCurrency)}</p>
                 </div>
               </div>
             </div>
@@ -83,7 +85,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, f
           <span className="bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-primary shadow-lg">Verified</span>
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/40 to-transparent">
-          <p className="text-2xl font-black text-white tracking-tighter">D {property.price.toLocaleString()}</p>
+          <p className="text-2xl font-black text-white tracking-tighter">{displayPrice(property.price, selectedCurrency)}</p>
         </div>
       </div>
       <div className="p-6 flex-grow flex flex-col">
