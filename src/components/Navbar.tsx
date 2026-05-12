@@ -53,7 +53,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           onClick={onLogoClick}
           className={`text-2xl font-black tracking-tighter cursor-pointer transition-colors ${textStyles}`}
         >
-          The Digital Estate
+          Diaspora Homes
         </span>
       </div>
 

@@ -293,7 +293,7 @@ export const SellerView: React.FC<SellerViewProps> = ({ onBack, isLoggedIn, setI
           <div>
             <h1 className="text-5xl md:text-6xl font-black text-primary tracking-tighter mb-6 leading-tight">
               Sell your property on <br />
-              <span className="text-secondary">The Digital Estate.</span>
+              <span className="text-secondary">Diaspora Homes.</span>
             </h1>
             <p className="text-xl text-on-surface-variant leading-relaxed max-w-lg mb-8">
               Join the world's top real estate network. Reach buyers and manage your listings easily.
@@ -821,7 +821,7 @@ export const SellerView: React.FC<SellerViewProps> = ({ onBack, isLoggedIn, setI
                     <div className="space-y-4 max-w-sm relative z-10">
                       <h3 className="text-3xl font-black text-primary tracking-tight">Your Portfolio is Empty</h3>
                       <p className="text-on-surface-variant font-medium leading-relaxed">
-                        Start your journey on The Digital Estate. List your premium properties and reach a global audience of verified buyers.
+                        Start your journey on Diaspora Homes. List your premium properties and reach a global audience of verified buyers.
                       </p>
                     </div>
 

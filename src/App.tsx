@@ -279,7 +279,7 @@ export default function App() {
                       <Home className="w-6 h-6" />
                     </div>
                     <h3 className="text-3xl font-bold mb-4">Verified Listings</h3>
-                    <p className="text-surface-variant font-medium leading-relaxed">Every property in The Digital Estate undergoes a rigorous legal and structural verification process by local experts.</p>
+                    <p className="text-surface-variant font-medium leading-relaxed">Every property in Diaspora Homes undergoes a rigorous legal and structural verification process by local experts.</p>
                   </div>
                   <div className="p-10 bg-secondary rounded-[2.5rem] text-white">
                     <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mb-6">
@@ -336,7 +336,7 @@ export default function App() {
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-16 mb-20">
               <div className="space-y-6">
-                <div className="font-black text-3xl tracking-tighter">The Digital Estate</div>
+                <div className="font-black text-3xl tracking-tighter">Diaspora Homes</div>
                 <p className="text-surface-variant/60 max-w-sm leading-relaxed text-lg">
                   The world's premier digital real estate platform. We connect global investors with verified properties.
                 </p>
@@ -368,7 +368,7 @@ export default function App() {
             </div>
             
             <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-              <p className="text-surface-variant/40 text-xs font-bold uppercase tracking-widest">© 2024 The Digital Estate. Built with pride for the World.</p>
+              <p className="text-surface-variant/40 text-xs font-bold uppercase tracking-widest">© 2026 Diaspora Homes. Built with pride for the World.</p>
             </div>
           </div>
         </footer>
