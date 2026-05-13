@@ -69,6 +69,8 @@ import { Property } from '../types';
 export const SellerView: React.FC<SellerViewProps> = ({ onBack, isLoggedIn, setIsLoggedIn, properties, setProperties }) => {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'profile'>('dashboard');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+  const [showContactForm, setShowContactForm] = useState(false);
+  const [contactFormStatus, setContactFormStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
 
   // Form state
   const [formData, setFormData] = useState({
@@ -391,61 +393,97 @@ export const SellerView: React.FC<SellerViewProps> = ({ onBack, isLoggedIn, setI
   }
 
   return (
-    <div className="min-h-screen bg-background/50">
-      <div className="max-w-7xl mx-auto px-6 py-12">
-      <div className="flex flex-col lg:flex-row gap-12 items-start">
-        {/* Sidebar */}
-        <aside className="lg:w-64 shrink-0 space-y-8 sticky top-12">
-          <div>
-            <h3 className="text-xs font-black uppercase tracking-widest text-on-surface-variant mb-4 ml-1">Menu</h3>
-            <nav className="space-y-2">
-              <button 
-                onClick={() => setActiveTab('dashboard')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'dashboard' ? 'bg-surface-variant/20 text-primary font-bold' : 'text-on-surface-variant font-medium hover:bg-surface-variant/10'}`}
-              >
-                <LayoutDashboard className="w-5 h-5" /> Dashboard
-              </button>
-              <button 
-                onClick={() => setActiveTab('profile')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'profile' ? 'bg-surface-variant/20 text-primary font-bold' : 'text-on-surface-variant font-medium hover:bg-surface-variant/10'}`}
-              >
-                <User className="w-5 h-5" /> Profile
-              </button>
-              <button 
-                onClick={() => setIsLoggedIn(false)}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-red-500 font-medium hover:bg-red-50"
-              >
-                <LogOut className="w-5 h-5" /> Logout
-              </button>
-            </nav>
-          </div>
-
-          <div className="bg-primary p-6 rounded-[2rem] text-white relative overflow-hidden group">
-            <div className="relative z-10">
-              <h4 className="font-bold text-lg mb-2">Need help?</h4>
-              <p className="text-surface-variant/60 text-sm mb-6">Call us for support.</p>
-              <a 
-                href="tel:2202725142"
-                className="w-full bg-white text-primary py-3 rounded-xl font-bold text-sm hover:scale-105 transition-transform flex items-center justify-center gap-2"
-              >
-                Call 220 2725142
-              </a>
+    <div className="min-h-screen bg-background/50 flex flex-col">
+      {/* Sticky Navigation Bar for Seller Portal */}
+      <div className="sticky top-0 z-[5000] bg-background/95 backdrop-blur-md border-b border-surface-variant/10 shadow-sm w-full">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-2.5 md:py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20">
+              <LayoutDashboard className="w-4 h-4 md:w-5 md:h-5" />
             </div>
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+            <div>
+              <h1 className="text-sm md:text-lg font-black text-primary tracking-tighter leading-none mb-0.5">
+                {activeTab === 'dashboard' ? 'Dashboard' : 'Profile'}
+              </h1>
+              <p className="text-[7px] md:text-[10px] text-on-surface-variant font-bold uppercase tracking-widest opacity-60">Seller Portal</p>
+            </div>
           </div>
-        </aside>
+          
+          <nav className="flex items-center gap-1">
+            <button 
+              onClick={() => setActiveTab('dashboard')}
+              className={`px-2.5 md:px-5 py-2 md:py-2.5 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'dashboard' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-on-surface-variant hover:bg-surface-variant/10'}`}
+            >
+              <span className="hidden sm:inline">Dashboard</span>
+              <LayoutDashboard className="w-3.5 h-3.5 sm:hidden" />
+            </button>
+            <button 
+              onClick={() => setActiveTab('profile')}
+              className={`px-2.5 md:px-5 py-2 md:py-2.5 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'profile' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-on-surface-variant hover:bg-surface-variant/10'}`}
+            >
+              <span className="hidden sm:inline">Profile</span>
+              <User className="w-3.5 h-3.5 sm:hidden" />
+            </button>
+            <button 
+              onClick={() => setIsLoggedIn(false)}
+              className="px-2.5 md:px-5 py-2 md:py-2.5 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 transition-all font-bold"
+            >
+              <span className="hidden sm:inline">Logout</span>
+              <LogOut className="w-3.5 h-3.5 sm:hidden" />
+            </button>
+          </nav>
+        </div>
+      </div>
 
-        {/* Main Content */}
-        <div className="flex-1 space-y-12">
+      <div className="flex-1 max-w-7xl mx-auto w-full px-4 md:px-6 py-4 md:py-12">
+        <div className="flex flex-col lg:flex-row gap-0 lg:gap-10 items-start">
+          {/* Support Sidebar (Desktop Only) */}
+          <aside className="hidden lg:block w-72 shrink-0 sticky top-28">
+            <div className="bg-primary p-8 rounded-[3rem] text-white relative overflow-hidden group border border-white/10 shadow-2xl shadow-primary/20">
+              <div className="relative z-10">
+                <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mb-6">
+                  <MessageCircle className="w-7 h-7" />
+                </div>
+                <h4 className="font-black text-2xl mb-3 tracking-tight">Expert Support</h4>
+                <p className="text-surface-variant/60 text-sm mb-8 leading-relaxed font-bold">Need help with your listings? Our experts are here 24/7.</p>
+                <button 
+                  onClick={() => setShowContactForm(true)}
+                  className="w-full bg-white text-primary py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-xl shadow-black/10"
+                >
+                  Contact Us
+                </button>
+              </div>
+              <div className="absolute -right-4 -bottom-4 w-40 h-40 bg-white/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-white/20 via-white/40 to-transparent"></div>
+            </div>
+
+            <div className="mt-8 p-8 rounded-[3rem] border border-surface-variant/20 bg-white/50 backdrop-blur-sm">
+              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant mb-6 opacity-40">Portal Status</h4>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold text-on-surface-variant">System Status</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-green-500 text-xs">Live</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold text-on-surface-variant">Verified Listings</span>
+                  <span className="text-xs font-black text-primary">100%</span>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+
+          {/* Main Content Area */}
+          <div className="flex-1 w-full space-y-12">
+            {/* Removed redundant titles from here */}
           {activeTab === 'dashboard' ? (
             <>
-              <header>
-                <h1 className="text-5xl font-black text-primary tracking-tighter mb-2">Dashboard</h1>
-                <p className="text-on-surface-variant font-medium">Manage your properties and profile here.</p>
-              </header>
 
               {/* Create New Listing */}
-              <section className="bg-white p-10 rounded-[2.5rem] border border-surface-variant/20 shadow-sm">
+              <section className="bg-white p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] border border-surface-variant/20 shadow-sm">
                 <div className="flex items-center justify-between mb-10">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center text-primary">
@@ -483,13 +521,13 @@ export const SellerView: React.FC<SellerViewProps> = ({ onBack, isLoggedIn, setI
                   {!listingFormData.id && <span className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">New</span>}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8">
                   <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant ml-1">Property Name</label>
                     <input 
                       type="text" 
                       placeholder='"The Azure Sanctuary"'
-                      className="w-full bg-background border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-primary/20 outline-none font-medium"
+                      className="w-full bg-background border-none rounded-xl px-4 md:px-6 py-3 md:py-4 focus:ring-2 focus:ring-primary/20 outline-none font-medium text-sm md:text-base"
                       value={listingFormData.propertyName || ''}
                       onChange={(e) => setListingFormData({...listingFormData, propertyName: e.target.value})}
                     />
@@ -556,7 +594,7 @@ export const SellerView: React.FC<SellerViewProps> = ({ onBack, isLoggedIn, setI
                         <input 
                           type="text" 
                           placeholder='"82,500,000"'
-                          className="w-full bg-background border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-primary/20 outline-none font-medium"
+                          className="w-full bg-background border-none rounded-xl px-4 md:px-6 py-3 md:py-4 focus:ring-2 focus:ring-primary/20 outline-none font-medium text-sm md:text-base"
                           value={listingFormData.price || ''}
                           onChange={(e) => {
                             const val = e.target.value.replace(/[^0-9]/g, '');
@@ -914,12 +952,7 @@ export const SellerView: React.FC<SellerViewProps> = ({ onBack, isLoggedIn, setI
             </>
           ) : (
             <>
-              <header>
-                <h1 className="text-5xl font-black text-primary tracking-tighter mb-2">Profile</h1>
-                <p className="text-on-surface-variant font-medium">Update your contact info and social links.</p>
-              </header>
-
-              <section className="bg-white p-10 rounded-[2.5rem] border border-surface-variant/20 shadow-sm">
+              <section className="bg-white p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] border border-surface-variant/20 shadow-sm">
                 <div className="flex items-center gap-4 mb-10">
                   <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center text-primary">
                     <User className="w-6 h-6" />
@@ -1039,16 +1072,112 @@ export const SellerView: React.FC<SellerViewProps> = ({ onBack, isLoggedIn, setI
         </div>
       </div>
       </div>
+      {/* Contact Us Modal */}
+      <AnimatePresence>
+        {showContactForm && (
+          <div className="fixed inset-0 z-[3000] flex items-start justify-center overflow-y-auto p-4 md:p-6 bg-primary/40 backdrop-blur-md">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowContactForm(false)}
+              className="fixed inset-0"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 max-w-lg w-full shadow-2xl border border-surface-variant/20 my-auto"
+            >
+              <button 
+                onClick={() => setShowContactForm(false)}
+                className="absolute top-6 md:top-8 right-6 md:right-8 p-2 rounded-full hover:bg-surface-variant/10 text-on-surface-variant transition-all z-10 bg-white/80 backdrop-blur-sm"
+              >
+                <X className="w-5 h-5 md:w-6 md:h-6" />
+              </button>
+
+              <div className="w-16 h-16 md:w-20 md:h-20 bg-primary/5 rounded-2xl md:rounded-3xl flex items-center justify-center text-primary mb-6 md:mb-8">
+                <MessageCircle className="w-8 h-8 md:w-10 md:h-10" />
+              </div>
+
+              {contactFormStatus === 'success' ? (
+                <div className="text-center py-8">
+                  <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 text-green-500">
+                    <Check className="w-10 h-10" />
+                  </div>
+                  <h3 className="text-3xl font-black text-primary tracking-tight mb-4">Message Sent!</h3>
+                  <p className="text-on-surface-variant font-medium leading-relaxed mb-10">
+                    Thank you for reaching out. Our support team will get back to you within 24 hours.
+                  </p>
+                  <button 
+                    onClick={() => {
+                      setShowContactForm(false);
+                      setContactFormStatus('idle');
+                    }}
+                    className="w-full px-8 py-4 bg-primary text-white rounded-2xl font-bold hover:shadow-lg transition-all"
+                  >
+                    Close
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <h3 className="text-3xl font-black text-primary tracking-tight mb-4">Contact Support</h3>
+                  <p className="text-on-surface-variant font-medium leading-relaxed mb-8">
+                    Have a question or need assistance? Fill out the form below and we'll help you out.
+                  </p>
+
+                  <form className="space-y-6" onSubmit={(e) => {
+                    e.preventDefault();
+                    setContactFormStatus('submitting');
+                    setTimeout(() => setContactFormStatus('success'), 1500);
+                  }}>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant ml-1">Subject</label>
+                      <input 
+                        required
+                        type="text" 
+                        placeholder="e.g. Question about listing verification"
+                        className="w-full bg-background border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-primary/20 outline-none font-medium"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant ml-1">Message</label>
+                      <textarea 
+                        required
+                        rows={4}
+                        placeholder="Tell us what you need help with..."
+                        className="w-full bg-background border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-primary/20 outline-none font-medium resize-none"
+                      />
+                    </div>
+                    <button 
+                      type="submit"
+                      disabled={contactFormStatus === 'submitting'}
+                      className="w-full px-8 py-5 bg-primary text-white rounded-2xl font-bold hover:shadow-xl hover:scale-[1.01] transition-all flex items-center justify-center gap-2"
+                    >
+                      {contactFormStatus === 'submitting' ? (
+                        <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <>Send Message <ChevronRight className="w-4 h-4" /></>
+                      )}
+                    </button>
+                  </form>
+                </>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Delete Confirmation Modal */}
       <AnimatePresence>
         {showDeleteConfirm && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+          <div className="fixed inset-0 z-[3000] flex items-center justify-center p-6 bg-primary/40 backdrop-blur-md">
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowDeleteConfirm(null)}
-              className="absolute inset-0 bg-primary/40 backdrop-blur-md"
+              className="fixed inset-0"
             />
             <motion.div 
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -1081,6 +1210,21 @@ export const SellerView: React.FC<SellerViewProps> = ({ onBack, isLoggedIn, setI
           </div>
         )}
       </AnimatePresence>
+
+      {/* Floating Contact Support Button */}
+      <motion.button
+        initial={{ opacity: 0, scale: 0.8, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setShowContactForm(true)}
+        className="fixed bottom-6 md:bottom-8 right-6 md:right-8 z-[1000] bg-primary text-white px-4 md:px-6 py-3.5 md:py-4 rounded-full font-black text-[10px] md:text-xs uppercase tracking-[0.2em] flex items-center gap-3 shadow-2xl shadow-primary/40 group border border-white/10"
+      >
+        <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:rotate-12 transition-transform">
+          <MessageCircle className="w-3.5 h-3.5 md:w-4 md:h-4" />
+        </div>
+        <span>Contact Support</span>
+      </motion.button>
     </div>
   );
 };

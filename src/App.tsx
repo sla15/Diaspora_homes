@@ -6,7 +6,7 @@ import { PropertyMap } from './components/PropertyMap';
 import { SellerView } from './components/SellerView';
 import { BrowseView } from './components/BrowseView';
 import { PROPERTIES, Property, CURRENCIES, CurrencyCode } from './types';
-import { Search, Home, SlidersHorizontal, CreditCard, TrendingUp, Mail, User, ArrowRight, ChevronDown } from 'lucide-react';
+import { Search, Home, SlidersHorizontal, CreditCard, TrendingUp, Mail, User, ArrowRight, ChevronDown, Maximize, Building2, MessageCircle, X, Check, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useEffect } from 'react';
 
@@ -45,6 +45,8 @@ export default function App() {
   const [isSellerLoggedIn, setIsSellerLoggedIn] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('GMD');
+  const [showContactForm, setShowContactForm] = useState(false);
+  const [contactFormStatus, setContactFormStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -86,7 +88,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-x-hidden">
       {!(view === 'sell' && isSellerLoggedIn) && (
         <Navbar 
           onSellClick={handleSell} 
@@ -179,41 +181,102 @@ export default function App() {
 
               {/* Quick Navigation */}
               <section className="px-6 mb-16 max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <button 
-                    onClick={() => handleBrowse('buy')}
-                    className="group relative h-64 rounded-[2.5rem] overflow-hidden flex items-center justify-center"
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                  {/* Buy Card */}
+                  <motion.div 
+                    whileHover={{ y: -10 }}
+                    onClick={() => {
+                      setHeroPropertyType('any');
+                      handleBrowse('buy');
+                    }}
+                    className="group bg-white rounded-[2.5rem] p-10 cursor-pointer border border-surface-variant/20 shadow-2xl shadow-primary/5 relative overflow-hidden"
                   >
-                    <img 
-                      className="absolute inset-0 w-full h-full object-cover brightness-50 group-hover:scale-110 transition-transform duration-700" 
-                      src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop" 
-                      alt="Buy Properties"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="relative z-10 text-center">
-                      <h3 className="text-4xl font-black text-white mb-2">Buy Property</h3>
-                      <div className="flex items-center justify-center gap-2 bg-primary text-white px-8 py-3 rounded-full font-bold uppercase tracking-widest text-xs shadow-xl">
-                        Explore Listings <ArrowRight className="w-4 h-4" />
-                      </div>
+                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform">
+                      <Search className="w-24 h-24" />
                     </div>
-                  </button>
-                  <button 
-                    onClick={() => handleBrowse('rent')}
-                    className="group relative h-64 rounded-[2.5rem] overflow-hidden flex items-center justify-center"
+                    <div className="w-16 h-16 rounded-[2rem] bg-primary/10 flex items-center justify-center text-primary mb-8">
+                      <Search className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-3xl font-black text-primary mb-4 leading-none">Buy Premium</h3>
+                    <p className="text-on-surface-variant font-bold text-sm leading-relaxed mb-6 opacity-70">
+                      Explore our curated collection of verified villas and high-end estates.
+                    </p>
+                    <div className="flex items-center gap-3 text-secondary font-black text-xs uppercase tracking-widest">
+                      View Listings <ArrowRight className="w-4 h-4" />
+                    </div>
+                  </motion.div>
+
+                  {/* Rent Card */}
+                  <motion.div 
+                    whileHover={{ y: -10 }}
+                    onClick={() => {
+                      setHeroPropertyType('any');
+                      handleBrowse('rent');
+                    }}
+                    className="group bg-secondary rounded-[2.5rem] p-10 cursor-pointer shadow-2xl shadow-secondary/20 relative overflow-hidden text-white"
                   >
-                    <img 
-                      className="absolute inset-0 w-full h-full object-cover brightness-50 group-hover:scale-110 transition-transform duration-700" 
-                      src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1935&auto=format&fit=crop" 
-                      alt="Rent Properties"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="relative z-10 text-center">
-                      <h3 className="text-4xl font-black text-white mb-2">Rentals</h3>
-                      <div className="flex items-center justify-center gap-2 bg-primary text-white px-8 py-3 rounded-full font-bold uppercase tracking-widest text-xs shadow-xl">
-                        View Available <ArrowRight className="w-4 h-4" />
-                      </div>
+                    <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
+                      <Home className="w-24 h-24" />
                     </div>
-                  </button>
+                    <div className="w-16 h-16 rounded-[2rem] bg-white/10 flex items-center justify-center text-white mb-8">
+                      <Home className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-3xl font-black mb-4 leading-none text-white">Elite Rentals</h3>
+                    <p className="text-surface-variant/60 font-bold text-sm leading-relaxed mb-6 opacity-70">
+                      Discover exclusive long-term stays and luxury short-term holiday homes.
+                    </p>
+                    <div className="flex items-center gap-3 text-white font-black text-xs uppercase tracking-widest">
+                      Explore rentals <ArrowRight className="w-4 h-4" />
+                    </div>
+                  </motion.div>
+
+                  {/* Land Card */}
+                  <motion.div 
+                    whileHover={{ y: -10 }}
+                    onClick={() => {
+                      setHeroPropertyType('land');
+                      handleBrowse('buy');
+                    }}
+                    className="group bg-white rounded-[2.5rem] p-10 cursor-pointer border border-surface-variant/20 shadow-2xl shadow-primary/5 relative overflow-hidden"
+                  >
+                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform">
+                      <Maximize className="w-24 h-24" />
+                    </div>
+                    <div className="w-16 h-16 rounded-[2rem] bg-secondary/10 flex items-center justify-center text-secondary mb-8">
+                      <Maximize className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-3xl font-black text-primary mb-4 leading-none">Plots of Land</h3>
+                    <p className="text-on-surface-variant font-bold text-sm leading-relaxed mb-6 opacity-70">
+                      Invest in premium residential and agricultural lands across prime locations.
+                    </p>
+                    <div className="flex items-center gap-3 text-secondary font-black text-xs uppercase tracking-widest">
+                      View Plots <ArrowRight className="w-4 h-4" />
+                    </div>
+                  </motion.div>
+
+                  {/* Commercial Card */}
+                  <motion.div 
+                    whileHover={{ y: -10 }}
+                    onClick={() => {
+                      setHeroPropertyType('commercial');
+                      handleBrowse('buy');
+                    }}
+                    className="group bg-primary text-white rounded-[2.5rem] p-10 cursor-pointer shadow-2xl shadow-primary/20 relative overflow-hidden"
+                  >
+                    <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
+                      <Building2 className="w-24 h-24" />
+                    </div>
+                    <div className="w-16 h-16 rounded-[2rem] bg-white/10 flex items-center justify-center text-white mb-8">
+                      <Building2 className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-3xl font-black mb-4 leading-none text-white">Commercial</h3>
+                    <p className="text-surface-variant/60 font-bold text-sm leading-relaxed mb-6 opacity-70">
+                      Modern business centers and retail spaces for corporate growth.
+                    </p>
+                    <div className="flex items-center gap-3 text-white font-black text-xs uppercase tracking-widest">
+                      Business Hubs <ArrowRight className="w-4 h-4" />
+                    </div>
+                  </motion.div>
                 </div>
               </section>
 
@@ -359,9 +422,7 @@ export default function App() {
                 <div className="space-y-6">
                   <h4 className="font-black uppercase tracking-widest text-xs text-secondary">Contact</h4>
                   <ul className="space-y-4 font-bold text-surface-variant/80">
-                    <li><a href="#" className="hover:text-secondary transition-colors">About Us</a></li>
-                    <li><a href="#" className="hover:text-secondary transition-colors">Contact Support</a></li>
-                    <li><a href="#" className="hover:text-secondary transition-colors">Privacy Policy</a></li>
+                    <li><button onClick={() => setShowContactForm(true)} className="hover:text-secondary transition-colors text-left">Contact Support</button></li>
                   </ul>
                 </div>
               </div>
@@ -373,6 +434,102 @@ export default function App() {
           </div>
         </footer>
       )}
+
+      {/* Global Contact Us Modal */}
+      <AnimatePresence>
+        {showContactForm && (
+          <div className="fixed inset-0 z-[10000] flex items-start justify-center overflow-y-auto p-4 md:p-6 bg-primary/40 backdrop-blur-md">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowContactForm(false)}
+              className="fixed inset-0"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 max-w-lg w-full shadow-2xl border border-surface-variant/20 my-auto"
+            >
+              <button 
+                onClick={() => setShowContactForm(false)}
+                className="absolute top-6 md:top-8 right-6 md:right-8 p-2 rounded-full hover:bg-surface-variant/10 text-on-surface-variant transition-all z-10 bg-white/80 backdrop-blur-sm"
+              >
+                <X className="w-5 h-5 md:w-6 md:h-6" />
+              </button>
+
+              <div className="w-16 h-16 md:w-20 md:h-20 bg-primary/5 rounded-2xl md:rounded-3xl flex items-center justify-center text-primary mb-6 md:mb-8">
+                <MessageCircle className="w-8 h-8 md:w-10 md:h-10" />
+              </div>
+
+              {contactFormStatus === 'success' ? (
+                <div className="text-center py-8">
+                  <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 text-green-500">
+                    <Check className="w-10 h-10" />
+                  </div>
+                  <h3 className="text-3xl font-black text-primary tracking-tight mb-4">Message Sent!</h3>
+                  <p className="text-on-surface-variant font-medium leading-relaxed mb-10">
+                    Thank you for reaching out. Our support team will get back to you within 24 hours.
+                  </p>
+                  <button 
+                    onClick={() => {
+                      setShowContactForm(false);
+                      setContactFormStatus('idle');
+                    }}
+                    className="w-full px-8 py-4 bg-primary text-white rounded-2xl font-bold hover:shadow-lg transition-all"
+                  >
+                    Close
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <h3 className="text-3xl font-black text-primary tracking-tight mb-4">Contact Support</h3>
+                  <p className="text-on-surface-variant font-medium leading-relaxed mb-8">
+                    Have a question or need assistance? Fill out the form below and we'll help you out.
+                  </p>
+
+                  <form className="space-y-6" onSubmit={(e) => {
+                    e.preventDefault();
+                    setContactFormStatus('submitting');
+                    setTimeout(() => setContactFormStatus('success'), 1500);
+                  }}>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant ml-1">Subject</label>
+                      <input 
+                        required
+                        type="text" 
+                        placeholder="e.g. Question about listing verification"
+                        className="w-full bg-background border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-primary/20 outline-none font-medium"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant ml-1">Message</label>
+                      <textarea 
+                        required
+                        rows={4}
+                        placeholder="Tell us what you need help with..."
+                        className="w-full bg-background border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-primary/20 outline-none font-medium resize-none"
+                      />
+                    </div>
+                    <button 
+                      type="submit"
+                      disabled={contactFormStatus === 'submitting'}
+                      className="w-full px-8 py-5 bg-primary text-white rounded-2xl font-bold hover:shadow-xl hover:scale-[1.01] transition-all flex items-center justify-center gap-2"
+                    >
+                      {contactFormStatus === 'submitting' ? (
+                        <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <>Send Message <ChevronRight className="w-4 h-4" /></>
+                      )}
+                    </button>
+                  </form>
+                </>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

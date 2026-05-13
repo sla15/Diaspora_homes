@@ -33,17 +33,17 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, f
               <span className="bg-primary text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-lg backdrop-blur-md">Featured</span>
               <span className="bg-secondary text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-lg backdrop-blur-md">New Build</span>
             </div>
-            <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/60 to-transparent">
-              <div className="flex justify-between items-end">
+            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 md:gap-8">
                 <div className="text-white">
-                  <h3 className="text-4xl font-black tracking-tighter mb-2">{property.title}</h3>
-                  <p className="flex items-center gap-2 font-bold text-white/80">
-                    <MapPin className="w-5 h-5 text-secondary" /> {property.location}
+                  <h3 className="text-2xl md:text-4xl font-black tracking-tighter mb-1 md:mb-2 leading-tight">{property.title}</h3>
+                  <p className="flex items-center gap-2 font-bold text-white/80 text-sm md:text-base">
+                    <MapPin className="w-4 h-4 md:w-5 md:h-5 text-secondary" /> {property.location}
                   </p>
                 </div>
-                <div className="text-right text-white">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-secondary mb-1">Price</p>
-                  <p className="text-3xl font-black">{displayPrice(property.price, selectedCurrency)}</p>
+                <div className="md:text-right text-white bg-black/20 backdrop-blur-sm p-3 md:p-0 rounded-2xl md:bg-transparent">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-secondary mb-0.5 md:mb-1">Price</p>
+                  <p className="text-2xl md:text-3xl font-black whitespace-nowrap">{displayPrice(property.price, selectedCurrency)}</p>
                 </div>
               </div>
             </div>

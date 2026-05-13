@@ -262,5 +262,78 @@ export const PROPERTIES: Property[] = [
       phone: "2203333333"
     },
     coordinates: [13.4722, -16.6917]
+  },
+  {
+    id: "brufut-garden-plot",
+    title: "Premium Residential Plot",
+    location: "Brufut Garden, West Coast Region, Gambia",
+    price: 3500000,
+    currency: "D",
+    type: 'buy',
+    propertyType: 'land',
+    bedrooms: 0,
+    bathrooms: 0,
+    sqm: 600,
+    parking: 0,
+    description: "A perfectly rectangular 20m x 30m residential plot in the highly sought-after Brufut Garden area. Fully fenced, with water and electricity connections already at the boundary. Ready for immediate construction of your dream villa.",
+    images: ["https://images.unsplash.com/photo-1500382017468-9049fee74a62?q=80&w=2070&auto=format&fit=crop"],
+    features: ["Security", "Prime Location", "Solar Array"],
+    agent: {
+      name: "Mustapha Bah",
+      role: "Listing Agent",
+      rating: 5,
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop",
+      phone: "2207777777"
+    },
+    coordinates: [13.3833, -16.75]
+  },
+  {
+    id: "bijilo-commercial-hub",
+    title: "Bijilo Business Center",
+    location: "Bertil Harding Highway, Bijilo, Gambia",
+    price: 450000,
+    currency: "D",
+    type: 'rent',
+    propertyType: 'commercial',
+    duration: 'monthly',
+    bedrooms: 0,
+    bathrooms: 4,
+    sqm: 450,
+    parking: 10,
+    description: "Prime commercial space on the main Bertil Harding Highway. Ideal for a flagship store, corporate office, or showroom. Features large glass frontage, dedicated parking, and backup generator connectivity.",
+    images: ["https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"],
+    features: ["Security", "AC", "Parking", "Modern Kitchen"],
+    agent: {
+      name: "Fatou Jallow",
+      role: "Senior Consultant",
+      rating: 4.8,
+      image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1976&auto=format&fit=crop",
+      phone: "2203333333"
+    },
+    coordinates: [13.4333, -16.7167]
+  },
+  {
+    id: "tujereng-estate-land",
+    title: "Agro-Residential Estate Plot",
+    location: "Tujereng, West Coast Region, Gambia",
+    price: 1800000,
+    currency: "D",
+    type: 'buy',
+    propertyType: 'land',
+    bedrooms: 0,
+    bathrooms: 0,
+    sqm: 1200,
+    parking: 0,
+    description: "Massive 1200sqm plot in the expanding Tujereng area. Perfect for a large homestead with garden space or a multi-unit development. The area is known for its fertile soil and proximity to the highway.",
+    images: ["https://images.unsplash.com/photo-1500382017468-9049fee74a62?q=80&w=2070&auto=format&fit=crop"],
+    features: ["Eco-friendly", "Private Garden"],
+    agent: {
+      name: "Ebrima Sowe",
+      role: "Property Manager",
+      rating: 4.5,
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1974&auto=format&fit=crop",
+      phone: "2205555555"
+    },
+    coordinates: [13.3167, -16.8]
   }
 ];
