@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { PropertyCard } from './PropertyCard';
-import { Property, PROPERTIES, CurrencyCode, COMMON_AMENITIES } from '../types';
+import { Property, PROPERTIES, CurrencyCode, COMMON_AMENITIES, CURRENCIES } from '../types';
 import { Search, SlidersHorizontal, Map as MapIcon, LayoutGrid, ChevronDown, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PropertyMap } from './PropertyMap';
@@ -38,6 +38,10 @@ export const BrowseView: React.FC<BrowseViewProps> = ({
   const [showFilters, setShowFilters] = useState(false);
   const [isPropertyTypeExpanded, setIsPropertyTypeExpanded] = useState(true);
   const [isAmenitiesExpanded, setIsAmenitiesExpanded] = useState(false);
+
+  const targetCurrency = useMemo(() => {
+    return CURRENCIES.find(c => c.code === selectedCurrency) || CURRENCIES[0];
+  }, [selectedCurrency]);
 
   const hasFilters = useMemo(() => {
     return (
@@ -291,6 +295,40 @@ export const BrowseView: React.FC<BrowseViewProps> = ({
                               {val}
                             </button>
                           ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-6 border-t border-surface-variant/10">
+                      <label className="text-xs font-black uppercase tracking-[0.2em] text-primary select-none">Price Range ({targetCurrency.symbol} - {targetCurrency.code})</label>
+                      <div className="grid grid-cols-2 gap-4 mt-4">
+                        <div className="relative flex items-center">
+                          <span className="absolute left-4 text-xs font-bold text-on-surface-variant/40">{targetCurrency.symbol}</span>
+                          <input 
+                            type="number" 
+                            placeholder="Min Price" 
+                            className="w-full bg-background border border-surface-variant/10 rounded-xl pl-10 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary/25 outline-none font-bold placeholder:text-on-surface-variant/30 text-primary"
+                            value={priceRange[0] === 0 ? '' : Math.round(priceRange[0] * targetCurrency.rate)}
+                            onChange={(e) => {
+                              const val = e.target.value === '' ? 0 : Number(e.target.value);
+                              const gmdVal = val / targetCurrency.rate;
+                              setPriceRange([gmdVal, priceRange[1]]);
+                            }}
+                          />
+                        </div>
+                        <div className="relative flex items-center">
+                          <span className="absolute left-4 text-xs font-bold text-on-surface-variant/40">{targetCurrency.symbol}</span>
+                          <input 
+                            type="number" 
+                            placeholder="Max Price" 
+                            className="w-full bg-background border border-surface-variant/10 rounded-xl pl-10 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary/25 outline-none font-bold placeholder:text-on-surface-variant/30 text-primary"
+                            value={priceRange[1] === 100000000 ? '' : Math.round(priceRange[1] * targetCurrency.rate)}
+                            onChange={(e) => {
+                              const val = e.target.value === '' ? 100000000 : Number(e.target.value);
+                              const gmdVal = val / targetCurrency.rate;
+                              setPriceRange([priceRange[0], gmdVal]);
+                            }}
+                          />
                         </div>
                       </div>
                     </div>

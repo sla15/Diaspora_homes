@@ -5,12 +5,86 @@ import { PropertyDetails } from './components/PropertyDetails';
 import { PropertyMap } from './components/PropertyMap';
 import { SellerView } from './components/SellerView';
 import { BrowseView } from './components/BrowseView';
+import { AdminView } from './components/AdminView';
 import { PROPERTIES, Property, CURRENCIES, CurrencyCode } from './types';
 import { Search, Home, SlidersHorizontal, CreditCard, TrendingUp, Mail, User, ArrowRight, ChevronDown, Maximize, Building2, MessageCircle, X, Check, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useEffect } from 'react';
 
 const STORAGE_KEY = 'the_digital_estate_listings';
+const REGISTRATION_STORAGE_KEY = 'diaspora_registration_requests';
+const INQUIRIES_STORAGE_KEY = 'diaspora_support_inquiries';
+
+const DEFAULT_REGISTRATIONS = [
+  {
+    id: 'req-1',
+    name: 'Mustapha Bah',
+    phone: '2207777777',
+    email: 'mustapha@diaspora.gm',
+    preferredPassword: 'mustapha-secret',
+    notes: 'Approved primary real estate broker for Brufut Heights sector.',
+    status: 'approved' as const,
+    submittedAt: '2026-05-20',
+    generatedUsername: 'mustapha_bah',
+    generatedPassword: 'DH-BAH-8910',
+    decisionDate: '2026-05-21',
+    adminNotes: 'Onboarded.'
+  },
+  {
+    id: 'req-2',
+    name: 'Fatou Jallow',
+    phone: '2203333333',
+    email: 'fatou.jallow@realestate.gm',
+    preferredPassword: 'fatou-secret',
+    notes: 'Premium agency consultant representing Kotu and Fajara listings.',
+    status: 'approved' as const,
+    submittedAt: '2026-05-21',
+    generatedUsername: 'fatou_jallow',
+    generatedPassword: 'DH-JALLOW-4821',
+    decisionDate: '2026-05-21',
+    adminNotes: 'Verified professional.'
+  },
+  {
+    id: 'req-3',
+    name: 'Ebrima Sowe',
+    phone: '2205555555',
+    email: 'ebrima@sanyang-villas.gm',
+    preferredPassword: 'sowe-secret',
+    notes: 'Wants to list shoreline development plots at Tujereng coastal road.',
+    status: 'pending' as const,
+    submittedAt: '2026-05-23'
+  },
+  {
+    id: 'req-4',
+    name: 'Amadou Diallo',
+    phone: '2209999999',
+    email: 'amadou@gambia-estate.com',
+    preferredPassword: 'amadou-secret',
+    notes: 'Local landlord looking to post rental units in Fajara.',
+    status: 'more_info' as const,
+    submittedAt: '2026-05-22',
+    adminNotes: 'Please supply scan of commercial business registration certificate.'
+  }
+];
+
+const DEFAULT_INQUIRIES = [
+  {
+    id: 'inq-1',
+    email: 'sladibba15@gmail.com',
+    subject: 'List a 6-bedroom oceanfront villa in Brufut',
+    message: 'Hi, I want to list a premium 6-bedroom oceanfront villa in Brufut heights. How can I verify my account so I can post it live immediately?',
+    submittedAt: '2026-05-23 04:30',
+    status: 'pending' as const
+  },
+  {
+    id: 'inq-2',
+    email: 'director@uk-diaspora.co.uk',
+    subject: 'Escrow payment and bank transfer compliance',
+    message: 'Hello, what escrow accounts do you use to hold Dalasi or GBP deposits before legal land transfers are validated?',
+    submittedAt: '2026-05-21 11:15',
+    status: 'resolved' as const
+  }
+];
 
 import { CustomDropdown } from './components/CustomDropdown';
 
@@ -21,8 +95,6 @@ export default function App() {
       try {
         const parsed = JSON.parse(saved);
         if (!Array.isArray(parsed)) return PROPERTIES;
-        // Merge saved with default if needed, or just use saved
-        // For this app, let's merge to ensure default ones are always there but user ones persist
         const userIds = new Set(parsed.map((p: Property) => p.id));
         const defaults = PROPERTIES.filter(p => !userIds.has(p.id));
         return [...parsed, ...defaults];
@@ -33,11 +105,43 @@ export default function App() {
     return PROPERTIES;
   });
 
+  const [registrationRequests, setRegistrationRequests] = useState(() => {
+    const saved = localStorage.getItem(REGISTRATION_STORAGE_KEY);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return DEFAULT_REGISTRATIONS;
+      }
+    }
+    return DEFAULT_REGISTRATIONS;
+  });
+
+  const [supportInquiries, setSupportInquiries] = useState(() => {
+    const saved = localStorage.getItem(INQUIRIES_STORAGE_KEY);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return DEFAULT_INQUIRIES;
+      }
+    }
+    return DEFAULT_INQUIRIES;
+  });
+
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(properties));
   }, [properties]);
 
-  const [view, setView] = useState<'home' | 'details' | 'sell' | 'browse'>('home');
+  useEffect(() => {
+    localStorage.setItem(REGISTRATION_STORAGE_KEY, JSON.stringify(registrationRequests));
+  }, [registrationRequests]);
+
+  useEffect(() => {
+    localStorage.setItem(INQUIRIES_STORAGE_KEY, JSON.stringify(supportInquiries));
+  }, [supportInquiries]);
+
+  const [view, setView] = useState<'home' | 'details' | 'sell' | 'browse' | 'admin'>('home');
   const [browseType, setBrowseType] = useState<'buy' | 'rent'>('buy');
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -47,6 +151,11 @@ export default function App() {
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('GMD');
   const [showContactForm, setShowContactForm] = useState(false);
   const [contactFormStatus, setContactFormStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+
+  // New binding states for contact inputs
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactSubject, setContactSubject] = useState('');
+  const [contactMessage, setContactMessage] = useState('');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -76,6 +185,12 @@ export default function App() {
     window.scrollTo(0, 0);
   };
 
+  const handleBackToBrowse = () => {
+    setSelectedProperty(null);
+    setView('browse');
+    window.scrollTo(0, 0);
+  };
+
   const handleBrowse = (type: 'buy' | 'rent') => {
     setBrowseType(type);
     setView('browse');
@@ -88,13 +203,14 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen overflow-x-hidden">
-      {!(view === 'sell' && isSellerLoggedIn) && (
+    <div className="min-h-screen overflow-x-clip">
+      {view !== 'sell' && view !== 'admin' && (
         <Navbar 
           onSellClick={handleSell} 
           onLogoClick={handleBackToHome}
           onBuyClick={() => handleBrowse('buy')}
           onRentClick={() => handleBrowse('rent')}
+          onAdminClick={() => { setView('admin'); window.scrollTo(0, 0); }}
           currentView={view}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -104,7 +220,7 @@ export default function App() {
         />
       )}
       
-      <main className={!(view === 'sell' && isSellerLoggedIn) ? (view === 'home' ? "" : "pt-24") : ""}>
+      <main className={(view !== 'sell' && view !== 'admin') ? (view === 'home' ? "" : "pt-24") : ""}>
         <AnimatePresence mode="wait">
           {view === 'home' ? (
             <motion.div 
@@ -377,7 +493,21 @@ export default function App() {
             <PropertyDetails 
               key="details"
               property={selectedProperty} 
-              onBack={handleBackToHome} 
+              onBack={handleBackToBrowse} 
+              selectedCurrency={selectedCurrency}
+              allProperties={properties}
+              onPropertyClick={handlePropertySelect}
+            />
+          ) : view === 'admin' ? (
+            <AdminView
+              key="admin"
+              onBack={handleBackToHome}
+              properties={properties}
+              setProperties={setProperties}
+              registrationRequests={registrationRequests}
+              setRegistrationRequests={setRegistrationRequests}
+              supportInquiries={supportInquiries}
+              setSupportInquiries={setSupportInquiries}
               selectedCurrency={selectedCurrency}
             />
           ) : (
@@ -388,13 +518,15 @@ export default function App() {
               setIsLoggedIn={setIsSellerLoggedIn}
               properties={properties}
               setProperties={setProperties}
+              registrationRequests={registrationRequests}
+              setRegistrationRequests={setRegistrationRequests}
             />
           )}
         </AnimatePresence>
       </main>
 
       {/* Footer */}
-      {!(view === 'sell' && isSellerLoggedIn) && (
+      {view !== 'admin' && view !== 'sell' && (
         <footer className="w-full py-20 px-6 bg-primary text-white mt-24">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-16 mb-20">
@@ -417,6 +549,7 @@ export default function App() {
                     <li><button onClick={() => handleBrowse('buy')} className="hover:text-secondary transition-colors">Buy Property</button></li>
                     <li><button onClick={() => handleBrowse('rent')} className="hover:text-secondary transition-colors">Rentals</button></li>
                     <li><button onClick={handleSell} className="hover:text-secondary transition-colors">Sell Property</button></li>
+                    <li><button onClick={() => { setView('admin'); window.scrollTo(0, 0); }} className="hover:text-secondary text-secondary font-black tracking-wider text-[11px] uppercase transition-colors text-left flex items-center gap-1.5 mt-2">🛡️ Admin Console</button></li>
                   </ul>
                 </div>
                 <div className="space-y-6">
@@ -492,8 +625,35 @@ export default function App() {
                   <form className="space-y-6" onSubmit={(e) => {
                     e.preventDefault();
                     setContactFormStatus('submitting');
-                    setTimeout(() => setContactFormStatus('success'), 1500);
+                    
+                    const newInq = {
+                      id: `inq-${Date.now()}`,
+                      email: contactEmail || 'visitor@diasporahomes.com',
+                      subject: contactSubject,
+                      message: contactMessage,
+                      submittedAt: new Date().toLocaleDateString() + ' ' + new Date().toTimeString().split(' ')[0],
+                      status: 'pending' as const
+                    };
+
+                    setTimeout(() => {
+                      setSupportInquiries(prev => [newInq, ...prev]);
+                      setContactFormStatus('success');
+                      setContactEmail('');
+                      setContactSubject('');
+                      setContactMessage('');
+                    }, 1200);
                   }}>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant ml-1">Email Address</label>
+                      <input 
+                        required
+                        type="email" 
+                        placeholder="your@email.com"
+                        className="w-full bg-background border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-primary/20 outline-none font-medium"
+                        value={contactEmail}
+                        onChange={(e) => setContactEmail(e.target.value)}
+                      />
+                    </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant ml-1">Subject</label>
                       <input 
@@ -501,6 +661,8 @@ export default function App() {
                         type="text" 
                         placeholder="e.g. Question about listing verification"
                         className="w-full bg-background border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-primary/20 outline-none font-medium"
+                        value={contactSubject}
+                        onChange={(e) => setContactSubject(e.target.value)}
                       />
                     </div>
                     <div className="space-y-2">
@@ -509,7 +671,9 @@ export default function App() {
                         required
                         rows={4}
                         placeholder="Tell us what you need help with..."
-                        className="w-full bg-background border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-primary/20 outline-none font-medium resize-none"
+                        className="w-full bg-background border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-primary/20 outline-none font-medium resize-none shadow-inner"
+                        value={contactMessage}
+                        onChange={(e) => setContactMessage(e.target.value)}
                       />
                     </div>
                     <button 

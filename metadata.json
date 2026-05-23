@@ -1,5 +1,6 @@
 {
   "name": "Diaspora Homes",
   "description": "A premium global real estate discovery platform for luxury properties worldwide.",
-  "requestFramePermissions": ["geolocation"]
+  "requestFramePermissions": ["geolocation", "camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

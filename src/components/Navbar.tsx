@@ -8,7 +8,8 @@ interface NavbarProps {
   onLogoClick: () => void;
   onBuyClick: () => void;
   onRentClick: () => void;
-  currentView: 'home' | 'details' | 'sell' | 'browse';
+  onAdminClick: () => void;
+  currentView: 'home' | 'details' | 'sell' | 'browse' | 'admin';
   searchQuery: string;
   onSearchChange: (query: string) => void;
   isScrolled?: boolean;
@@ -21,6 +22,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onLogoClick, 
   onBuyClick, 
   onRentClick, 
+  onAdminClick,
   currentView,
   searchQuery,
   onSearchChange,
@@ -33,8 +35,9 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const navLinks = [
     { label: 'Home', onClick: () => { onLogoClick(); setIsMenuOpen(false); }, active: currentView === 'home' },
-    { label: 'Buy', onClick: () => { onBuyClick(); setIsMenuOpen(false); }, active: currentView === 'browse' },
+    { label: 'Buy/Rent', onClick: () => { onBuyClick(); setIsMenuOpen(false); }, active: currentView === 'browse' },
     { label: 'Sell', onClick: () => { onSellClick(); setIsMenuOpen(false); }, active: currentView === 'sell' },
+    { label: 'Admin', onClick: () => { onAdminClick(); setIsMenuOpen(false); }, active: currentView === 'admin' },
   ];
 
   const headerStyles = currentView === 'home' 

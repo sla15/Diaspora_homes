@@ -335,5 +335,113 @@ export const PROPERTIES: Property[] = [
       phone: "2205555555"
     },
     coordinates: [13.3167, -16.8]
+  },
+  {
+    id: "atlantic-breeze",
+    title: "Atlantic Breeze Villa",
+    location: "Brufut Heights, West Coast Region, Gambia",
+    price: 48000000,
+    currency: "D",
+    type: 'buy',
+    propertyType: 'villa',
+    duration: 'full',
+    bedrooms: 4,
+    bathrooms: 4,
+    sqm: 480,
+    parking: 2,
+    description: "Nestled along the premium coastline of Brufut Heights, this modern architectural gem blends seamless indoor-outdoor living with breathtaking views of the ocean. Styled with high-end travertine tiles, custom hardwood accents, and floor-to-ceiling panoramic glass doors.",
+    images: [
+      "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?q=80&w=1974&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop"
+    ],
+    features: [
+      "Pool",
+      "Solar Array",
+      "Security",
+      "Modern Kitchen",
+      "AC"
+    ],
+    agent: {
+      name: "Mustapha Bah",
+      role: "Listing Agent",
+      rating: 5,
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop",
+      phone: "2207777777",
+      whatsapp: "2207777777",
+      instagram: "instagram.com/mustapha_realestate",
+      facebook: "facebook.com/mustaphabah"
+    },
+    coordinates: [13.3853, -16.7621]
+  },
+  {
+    id: "senegambia-penthouse",
+    title: "Senegambia Luxury Penthouse",
+    location: "Kololi, Kanifing Municipality, Gambia",
+    price: 150000,
+    currency: "D",
+    type: 'rent',
+    propertyType: 'apartment',
+    duration: 'monthly',
+    bedrooms: 3,
+    bathrooms: 3,
+    sqm: 290,
+    parking: 2,
+    description: "An exclusive split-level penthouse in the ultra-trendy Senegambia neighborhood of Kololi. Walking distance to the finest restaurants and the beach. Premium finishes, luxury furnishings, and two massive rooftop entertaining terraces.",
+    images: [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1980&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=1974&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=2070&auto=format&fit=crop"
+    ],
+    features: [
+      "Pool",
+      "Security",
+      "AC",
+      "Balcony",
+      "Modern Kitchen"
+    ],
+    agent: {
+      name: "Fatou Jallow",
+      role: "Senior Consultant",
+      rating: 4.8,
+      image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1976&auto=format&fit=crop",
+      phone: "2203333333",
+      instagram: "instagram.com/fatou_jallow_property"
+    },
+    coordinates: [13.435, -16.721]
+  },
+  {
+    id: "kerr-sering-estate",
+    title: "Kerr Sering Garden Estate",
+    location: "Kerr Sering, Kanifing Municipality, Gambia",
+    price: 19500000,
+    currency: "D",
+    type: 'buy',
+    propertyType: 'house',
+    duration: 'full',
+    bedrooms: 4,
+    bathrooms: 3,
+    sqm: 380,
+    parking: 3,
+    description: "Set in a beautifully landscaped half-acre tropical garden, this traditional yet modern family home is located in a quiet enclave of Kerr Sering. Boasts high wooden ceilings, a massive poolside gazebo, and a self-contained double-room boys-quarters.",
+    images: [
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=2070&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1512915922686-57c11dde9b6b?q=80&w=2073&auto=format&fit=crop"
+    ],
+    features: [
+      "Pool",
+      "Security",
+      "Private Garden",
+      "Eco-friendly"
+    ],
+    agent: {
+      name: "Ebrima Sowe",
+      role: "Property Manager",
+      rating: 4.5,
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1974&auto=format&fit=crop",
+      phone: "2205555555"
+    },
+    coordinates: [13.428, -16.715]
   }
 ];
