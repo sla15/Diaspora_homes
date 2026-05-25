@@ -331,6 +331,7 @@ export default function App() {
                   {/* Buy Card - Ultimate Anchor */}
                   <motion.div 
                     whileHover={{ y: -10 }}
+                    whileTap={{ scale: 0.97 }}
                     onClick={() => {
                       setHeroPropertyType('any');
                       handleBrowse('buy');
@@ -357,6 +358,7 @@ export default function App() {
                   {/* Rent Card - Secondary Anchor */}
                   <motion.div 
                     whileHover={{ y: -10 }}
+                    whileTap={{ scale: 0.97 }}
                     onClick={() => {
                       setHeroPropertyType('any');
                       handleBrowse('rent');
@@ -383,6 +385,7 @@ export default function App() {
                   {/* Agents Card */}
                   <motion.div 
                     whileHover={{ y: -10 }}
+                    whileTap={{ scale: 0.97 }}
                     onClick={() => {
                       setView('services');
                       window.scrollTo(0, 0);
@@ -409,6 +412,7 @@ export default function App() {
                   {/* Commercial Card */}
                   <motion.div 
                     whileHover={{ y: -10 }}
+                    whileTap={{ scale: 0.97 }}
                     onClick={() => {
                       setHeroPropertyType('commercial');
                       handleBrowse('buy');
@@ -435,6 +439,7 @@ export default function App() {
                   {/* Service Provider Card - Footer Feature Anchor */}
                   <motion.div 
                     whileHover={{ y: -10 }}
+                    whileTap={{ scale: 0.97 }}
                     onClick={() => {
                       setView('services');
                       window.scrollTo(0, 0);
