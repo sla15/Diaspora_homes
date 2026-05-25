@@ -28,6 +28,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, f
               src={property.images[0]} 
               alt={property.title}
               referrerPolicy="no-referrer"
+              loading="lazy"
             />
             <div className="absolute top-8 left-8 flex gap-3">
               <span className="bg-primary text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-lg backdrop-blur-md">Featured</span>
@@ -80,6 +81,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick, f
           src={property.images[0]} 
           alt={property.title}
           referrerPolicy="no-referrer"
+          loading="lazy"
         />
         <div className="absolute top-6 left-6">
           <span className="bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-primary shadow-lg">Verified</span>

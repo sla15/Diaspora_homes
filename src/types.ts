@@ -90,60 +90,60 @@ export interface POI {
 
 export const POIS: POI[] = [
   {
-    id: "arch-22",
-    title: "Arch 22",
-    description: "A commemorative arch on the road into Banjul, offering panoramic views of the city.",
+    id: "table-mountain",
+    title: "Table Mountain",
+    description: "An iconic flat-topped mountain overlooking the city of Cape Town, South Africa.",
+    category: 'nature',
+    coordinates: [-33.9628, 18.4098]
+  },
+  {
+    id: "hyde-park",
+    title: "Hyde Park",
+    description: "One of the largest royal parks in London, offering vast green space and a serene lake.",
+    category: 'nature',
+    coordinates: [51.5073, -0.1657]
+  },
+  {
+    id: "blue-mountains",
+    title: "Blue Mountains",
+    description: "A majestic, heavily forested region in Jamaica known for Blue Mountain coffee.",
+    category: 'nature',
+    coordinates: [18.0463, -76.6548]
+  },
+  {
+    id: "national-theatre",
+    title: "National Arts Theatre",
+    description: "The primary center for performing arts in Lagos, Nigeria, shaped like a military cap.",
     category: 'landmark',
-    coordinates: [13.4564, -16.5819]
+    coordinates: [6.4913, 3.3698]
   },
   {
-    id: "kachikally",
-    title: "Kachikally Crocodile Pool",
-    description: "A sacred crocodile pool in Bakau, used for fertility rituals.",
-    category: 'nature',
-    coordinates: [13.4764, -16.6719]
+    id: "shibuya-crossing",
+    title: "Shibuya Crossing",
+    description: "The world's busiest pedestrian scramble crossing, located in Tokyo, Japan.",
+    category: 'landmark',
+    coordinates: [35.6595, 139.7005]
   },
   {
-    id: "abuko",
-    title: "Abuko Nature Reserve",
-    description: "Gambia's first nature reserve, home to diverse wildlife and tropical flora.",
-    category: 'nature',
-    coordinates: [13.3933, -16.6500]
-  },
-  {
-    id: "serekunda-market",
-    title: "Serekunda Market",
-    description: "The largest and busiest market in Gambia, a vibrant hub of local life.",
-    category: 'market',
-    coordinates: [13.4383, -16.6833]
-  },
-  {
-    id: "bijilo-forest",
-    title: "Bijilo Forest Park",
-    description: "A coastal forest park known for its monkey population and birdlife.",
-    category: 'nature',
-    coordinates: [13.4333, -16.7250]
-  },
-  {
-    id: "kotu-beach",
-    title: "Kotu Beach",
-    description: "One of Gambia's most popular beaches, known for its golden sands and birdwatching opportunities.",
+    id: "copacabana-beach",
+    title: "Copacabana Beach",
+    description: "A world-famous 4km crescent-shaped beach in Rio de Janeiro, Brazil.",
     category: 'beach',
-    coordinates: [13.4583, -16.7125]
+    coordinates: [-22.9714, -43.1823]
   },
   {
-    id: "craft-market",
-    title: "Senegambia Craft Market",
-    description: "A great place to find local woodcarvings, textiles, and traditional Gambian crafts.",
-    category: 'market',
-    coordinates: [13.4389, -16.7214]
-  },
-  {
-    id: "fajara-golf",
-    title: "Fajara Golf Club",
-    description: "A historic golf course offering beautiful views and a relaxed atmosphere.",
+    id: "tulum-ruins",
+    title: "Tulum Archaeological Zone",
+    description: "Stunning 13th-century walled Mayan ruins perched on cliffs above the Caribbean Sea.",
     category: 'landmark',
-    coordinates: [13.4722, -16.6917]
+    coordinates: [20.2151, -87.4293]
+  },
+  {
+    id: "black-star-square",
+    title: "Black Star Square",
+    description: "A monumental public square in Accra, Ghana, symbolizing independence and freedom.",
+    category: 'landmark',
+    coordinates: [5.5488, -0.1926]
   }
 ];
 
@@ -151,7 +151,7 @@ export const PROPERTIES: Property[] = [
   {
     id: "azure-sanctuary",
     title: "The Azure Sanctuary",
-    location: "Brufut Heights, West Coast Region, Gambia",
+    location: "Clifton, Cape Town, South Africa",
     price: 82500000,
     currency: "D",
     type: 'buy',
@@ -161,7 +161,7 @@ export const PROPERTIES: Property[] = [
     bathrooms: 6,
     sqm: 850,
     parking: 3,
-    description: "Designed as a dialogue between modern brutalism and the serene Atlantic horizon, The Azure Sanctuary offers unparalleled luxury in Brufut Heights. This estate features an open-concept living space that flows seamlessly onto a 200sqm travertine deck. Every room offers panoramic ocean views, framed by double-glazed acoustic glass to ensure total tranquility.",
+    description: "Designed as a dialogue between modern brutalism and the serene Atlantic horizon, The Azure Sanctuary offers unparalleled luxury in Clifton, Cape Town. This estate features an open-concept living space that flows seamlessly onto a 200sqm travertine deck. Every room offers panoramic ocean views, framed by double-glazed acoustic glass to ensure total tranquility.",
     images: [
       "https://images.unsplash.com/photo-1613490493576-7fde63acd811?q=80&w=2071&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop",
@@ -181,17 +181,17 @@ export const PROPERTIES: Property[] = [
       role: "Listing Agent",
       rating: 5,
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop",
-      phone: "2207777777",
-      whatsapp: "2207777777",
+      phone: "+27 21 777 7777",
+      whatsapp: "+27 21 777 7777",
       instagram: "instagram.com/mustapha_realestate",
       facebook: "facebook.com/mustaphabah"
     },
-    coordinates: [13.3833, -16.7667]
+    coordinates: [-33.9372, 18.3789]
   },
   {
     id: "kotu-heights",
-    title: "Kotu Heights Loft",
-    location: "Kotu, Kanifing Municipality, Gambia",
+    title: "Kensington Heights Loft",
+    location: "Kensington, London, United Kingdom",
     price: 21120000,
     currency: "D",
     type: 'buy',
@@ -201,7 +201,7 @@ export const PROPERTIES: Property[] = [
     bathrooms: 2,
     sqm: 210,
     parking: 1,
-    description: "Stylish boutique apartment interior in Kotu, contemporary African art on walls, soft neutral tones, evening lighting.",
+    description: "Stylish boutique apartment interior in Kensington, contemporary European art on walls, soft neutral tones, evening lighting.",
     images: ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2070&auto=format&fit=crop"],
     features: ["Pool", "Modern Kitchen", "Balcony", "Security"],
     agent: {
@@ -209,14 +209,14 @@ export const PROPERTIES: Property[] = [
       role: "Senior Consultant",
       rating: 4.8,
       image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1976&auto=format&fit=crop",
-      phone: "2203333333"
+      phone: "+44 20 3333 3333"
     },
-    coordinates: [13.4583, -16.7125]
+    coordinates: [51.5014, -0.1921]
   },
   {
     id: "sanyang-beach",
-    title: "Sanyang Beach House",
-    location: "Sanyang, West Coast Region, Gambia",
+    title: "Cabarete Breeze Beach House",
+    location: "Cabarete, Puerto Plata, Dominican Republic",
     price: 12870000,
     currency: "D",
     type: 'buy',
@@ -226,7 +226,7 @@ export const PROPERTIES: Property[] = [
     bathrooms: 1,
     sqm: 120,
     parking: 2,
-    description: "Minimalist pool house in Sanyang, white walls, turquoise water, palm tree shadows, bright sunny day.",
+    description: "Minimalist pool house in Cabarete, white walls, turquoise water, palm tree shadows, bright sunny day.",
     images: ["https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=2070&auto=format&fit=crop"],
     features: ["Beachfront", "Eco-friendly", "Private Garden", "Solar Array"],
     agent: {
@@ -234,14 +234,14 @@ export const PROPERTIES: Property[] = [
       role: "Property Manager",
       rating: 4.5,
       image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1974&auto=format&fit=crop",
-      phone: "2205555555"
+      phone: "+1 809 555 5555"
     },
-    coordinates: [13.2667, -16.7833]
+    coordinates: [19.7497, -70.4087]
   },
   {
     id: "modern-apartment-fajara",
-    title: "Modern Fajara Apartment",
-    location: "Fajara, Kanifing Municipality, Gambia",
+    title: "Modern Cantonments Suite",
+    location: "Cantonments, Accra, Ghana",
     price: 45000,
     currency: "D",
     type: 'rent',
@@ -251,7 +251,7 @@ export const PROPERTIES: Property[] = [
     bathrooms: 2,
     sqm: 140,
     parking: 1,
-    description: "Modern 2-bedroom apartment in the heart of Fajara. Close to all amenities and the beach.",
+    description: "Modern 2-bedroom apartment in the heart of Cantonments. Close to all amenities and premium business hubs.",
     images: ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1980&auto=format&fit=crop"],
     features: ["Security", "Furnished", "Balcony", "AC"],
     agent: {
@@ -259,14 +259,14 @@ export const PROPERTIES: Property[] = [
       role: "Senior Consultant",
       rating: 4.8,
       image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1976&auto=format&fit=crop",
-      phone: "2203333333"
+      phone: "+233 30 333 3333"
     },
-    coordinates: [13.4722, -16.6917]
+    coordinates: [5.5683, -0.1708]
   },
   {
     id: "brufut-garden-plot",
-    title: "Premium Residential Plot",
-    location: "Brufut Garden, West Coast Region, Gambia",
+    title: "Premium Residential Plot Epe",
+    location: "Epe, Lagos State, Nigeria",
     price: 3500000,
     currency: "D",
     type: 'buy',
@@ -275,7 +275,7 @@ export const PROPERTIES: Property[] = [
     bathrooms: 0,
     sqm: 600,
     parking: 0,
-    description: "A perfectly rectangular 20m x 30m residential plot in the highly sought-after Brufut Garden area. Fully fenced, with water and electricity connections already at the boundary. Ready for immediate construction of your dream villa.",
+    description: "A perfectly rectangular 20m x 30m residential plot in the highly sought-after Epe development. Fully fenced, with water and electricity connections already at the boundary. Ready for immediate construction of your dream villa.",
     images: ["https://images.unsplash.com/photo-1500382017468-9049fee74a62?q=80&w=2070&auto=format&fit=crop"],
     features: ["Security", "Prime Location", "Solar Array"],
     agent: {
@@ -283,14 +283,14 @@ export const PROPERTIES: Property[] = [
       role: "Listing Agent",
       rating: 5,
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop",
-      phone: "2207777777"
+      phone: "+234 1 777 7777"
     },
-    coordinates: [13.3833, -16.75]
+    coordinates: [6.5833, 3.9833]
   },
   {
     id: "bijilo-commercial-hub",
-    title: "Bijilo Business Center",
-    location: "Bertil Harding Highway, Bijilo, Gambia",
+    title: "Westlands Elite Business Plaza",
+    location: "Westlands, Nairobi, Kenya",
     price: 450000,
     currency: "D",
     type: 'rent',
@@ -300,7 +300,7 @@ export const PROPERTIES: Property[] = [
     bathrooms: 4,
     sqm: 450,
     parking: 10,
-    description: "Prime commercial space on the main Bertil Harding Highway. Ideal for a flagship store, corporate office, or showroom. Features large glass frontage, dedicated parking, and backup generator connectivity.",
+    description: "Prime commercial space in the main business sector of Westlands. Ideal for a flagship store, corporate office, or luxury showroom. Features large glass frontage, dedicated parking, and backup generator connectivity.",
     images: ["https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"],
     features: ["Security", "AC", "Parking", "Modern Kitchen"],
     agent: {
@@ -308,14 +308,14 @@ export const PROPERTIES: Property[] = [
       role: "Senior Consultant",
       rating: 4.8,
       image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1976&auto=format&fit=crop",
-      phone: "2203333333"
+      phone: "+254 20 333 3333"
     },
-    coordinates: [13.4333, -16.7167]
+    coordinates: [-1.2635, 36.8041]
   },
   {
     id: "tujereng-estate-land",
-    title: "Agro-Residential Estate Plot",
-    location: "Tujereng, West Coast Region, Gambia",
+    title: "Agro-Residential Estate St. Elizabeth",
+    location: "St. Elizabeth, Jamaica",
     price: 1800000,
     currency: "D",
     type: 'buy',
@@ -324,7 +324,7 @@ export const PROPERTIES: Property[] = [
     bathrooms: 0,
     sqm: 1200,
     parking: 0,
-    description: "Massive 1200sqm plot in the expanding Tujereng area. Perfect for a large homestead with garden space or a multi-unit development. The area is known for its fertile soil and proximity to the highway.",
+    description: "Massive 1200sqm plot in the expanding and beautiful St. Elizabeth parish. Perfect for a large homestead with garden space or a multi-unit development. The area is known for its fertile soil and proximity to the highway.",
     images: ["https://images.unsplash.com/photo-1500382017468-9049fee74a62?q=80&w=2070&auto=format&fit=crop"],
     features: ["Eco-friendly", "Private Garden"],
     agent: {
@@ -332,14 +332,14 @@ export const PROPERTIES: Property[] = [
       role: "Property Manager",
       rating: 4.5,
       image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1974&auto=format&fit=crop",
-      phone: "2205555555"
+      phone: "+1 876 555 5555"
     },
-    coordinates: [13.3167, -16.8]
+    coordinates: [18.0264, -77.7770]
   },
   {
     id: "atlantic-breeze",
-    title: "Atlantic Breeze Villa",
-    location: "Brufut Heights, West Coast Region, Gambia",
+    title: "Dakar Ocean Breeze Villa",
+    location: "Almadies, Dakar, Senegal",
     price: 48000000,
     currency: "D",
     type: 'buy',
@@ -349,7 +349,7 @@ export const PROPERTIES: Property[] = [
     bathrooms: 4,
     sqm: 480,
     parking: 2,
-    description: "Nestled along the premium coastline of Brufut Heights, this modern architectural gem blends seamless indoor-outdoor living with breathtaking views of the ocean. Styled with high-end travertine tiles, custom hardwood accents, and floor-to-ceiling panoramic glass doors.",
+    description: "Nestled along the premium coastline of Almadies, this modern architectural gem blends seamless indoor-outdoor living with breathtaking views of the ocean. Styled with high-end travertine tiles, custom hardwood accents, and floor-to-ceiling panoramic glass doors.",
     images: [
       "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?q=80&w=1974&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop",
@@ -367,17 +367,17 @@ export const PROPERTIES: Property[] = [
       role: "Listing Agent",
       rating: 5,
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop",
-      phone: "2207777777",
-      whatsapp: "2207777777",
+      phone: "+221 33 777 7777",
+      whatsapp: "+221 33 777 7777",
       instagram: "instagram.com/mustapha_realestate",
       facebook: "facebook.com/mustaphabah"
     },
-    coordinates: [13.3853, -16.7621]
+    coordinates: [14.7483, -17.5147]
   },
   {
     id: "senegambia-penthouse",
-    title: "Senegambia Luxury Penthouse",
-    location: "Kololi, Kanifing Municipality, Gambia",
+    title: "Saint-Tropez Luxury Penthouse",
+    location: "Saint-Tropez, French Riviera, France",
     price: 150000,
     currency: "D",
     type: 'rent',
@@ -387,7 +387,7 @@ export const PROPERTIES: Property[] = [
     bathrooms: 3,
     sqm: 290,
     parking: 2,
-    description: "An exclusive split-level penthouse in the ultra-trendy Senegambia neighborhood of Kololi. Walking distance to the finest restaurants and the beach. Premium finishes, luxury furnishings, and two massive rooftop entertaining terraces.",
+    description: "An exclusive split-level penthouse in the ultra-trendy Saint-Tropez area. Walking distance to the finest restaurants and the beach. Premium finishes, luxury furnishings, and two massive rooftop entertaining terraces.",
     images: [
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1980&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=1974&auto=format&fit=crop",
@@ -405,15 +405,15 @@ export const PROPERTIES: Property[] = [
       role: "Senior Consultant",
       rating: 4.8,
       image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1976&auto=format&fit=crop",
-      phone: "2203333333",
+      phone: "+33 4 3333 3333",
       instagram: "instagram.com/fatou_jallow_property"
     },
-    coordinates: [13.435, -16.721]
+    coordinates: [43.2678, 6.6405]
   },
   {
     id: "kerr-sering-estate",
-    title: "Kerr Sering Garden Estate",
-    location: "Kerr Sering, Kanifing Municipality, Gambia",
+    title: "Tulum Tropical Garden Estate",
+    location: "Tulum, Quintana Roo, Mexico",
     price: 19500000,
     currency: "D",
     type: 'buy',
@@ -423,7 +423,7 @@ export const PROPERTIES: Property[] = [
     bathrooms: 3,
     sqm: 380,
     parking: 3,
-    description: "Set in a beautifully landscaped half-acre tropical garden, this traditional yet modern family home is located in a quiet enclave of Kerr Sering. Boasts high wooden ceilings, a massive poolside gazebo, and a self-contained double-room boys-quarters.",
+    description: "Set in a beautifully landscaped half-acre tropical garden, this traditional yet modern family home is located in a quiet enclave of Tulum. Boasts high wooden ceilings, a massive poolside gazebo, and state-of-the-art climate-efficient engineering.",
     images: [
       "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=2070&auto=format&fit=crop",
@@ -440,8 +440,8 @@ export const PROPERTIES: Property[] = [
       role: "Property Manager",
       rating: 4.5,
       image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1974&auto=format&fit=crop",
-      phone: "2205555555"
+      phone: "+52 984 555 5555"
     },
-    coordinates: [13.428, -16.715]
+    coordinates: [20.2114, -87.4658]
   }
 ];

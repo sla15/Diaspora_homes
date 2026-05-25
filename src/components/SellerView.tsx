@@ -55,17 +55,32 @@ import { CustomDropdown } from './CustomDropdown';
 
 interface RegistrationRequest {
   id: string;
-  name: string;
+  verificationType: 'individual' | 'company';
+  title?: string;
+  firstName?: string;
+  middleName?: string;
+  surname?: string;
+  name: string; // Combined display name (either full name or company name)
   phone: string;
   email: string;
   preferredPassword: string;
-  notes?: string;
+  notes?: string; // Brief Onboarding Note
   status: 'pending' | 'approved' | 'rejected' | 'more_info';
   submittedAt: string;
   decisionDate?: string;
   adminNotes?: string;
   generatedUsername?: string;
   generatedPassword?: string;
+  
+  // Anti-fraud detail fields
+  nationalId?: string; // National ID Card
+  companyName?: string; // Company Name
+  companyRegistrationNumber?: string; // Company Registration Number 
+  role: string; // Vetted role
+  idCardPhoto?: string; // Scanned file uploads or Camera snap (base64)
+  companyCertificatePhoto?: string; // scanned document (base64)
+  ipAddress?: string;
+  deviceTrustScore?: number;
 }
 
 interface SellerViewProps {
@@ -112,6 +127,23 @@ export const SellerView: React.FC<SellerViewProps> = ({
   const [authError, setAuthError] = useState('');
   const [appSubmitted, setAppSubmitted] = useState(false);
   const [tempRegName, setTempRegName] = useState('');
+
+  // Rich Verification form states
+  const [regType, setRegType] = useState<'individual' | 'company'>('individual');
+  const [regTitle, setRegTitle] = useState<string>('Mr');
+  const [regFirstName, setRegFirstName] = useState<string>('');
+  const [regMiddleName, setRegMiddleName] = useState<string>('');
+  const [regSurname, setRegSurname] = useState<string>('');
+  const [regPhone, setRegPhone] = useState<string>('');
+  const [regEmail, setRegEmail] = useState<string>('');
+  const [regCompanyName, setRegCompanyName] = useState<string>('');
+  const [regNationalId, setRegNationalId] = useState<string>('');
+  const [regCompanyRegNumber, setRegCompanyRegNumber] = useState<string>('');
+  const [regRole, setRegRole] = useState<string>('');
+  const [regPassword, setRegPassword] = useState<string>('');
+  const [regNotes, setRegNotes] = useState<string>('');
+  const [regIdPhoto, setRegIdPhoto] = useState<string>(''); // base64
+  const [regDocPhoto, setRegDocPhoto] = useState<string>(''); // base64 / certificate
 
   // Profile and Camera States & Handlers
   const [profileSaved, setProfileSaved] = useState(false);
@@ -491,15 +523,32 @@ export const SellerView: React.FC<SellerViewProps> = ({
   const handleApplyRequest = (e: React.FormEvent) => {
     e.preventDefault();
     
+    const combinedName = regType === 'company' 
+      ? regCompanyName 
+      : `${regTitle} ${regFirstName}${regMiddleName ? ' ' + regMiddleName : ''} ${regSurname}`;
+
     const newRequest: RegistrationRequest = {
       id: `req-${Math.floor(1000 + Math.random() * 9000)}`,
-      name: formData.name,
-      phone: formData.phone,
-      email: formData.email,
-      preferredPassword: formData.password,
-      notes: tempRegName || 'Professional real estate agency enrollment.',
+      verificationType: regType,
+      title: regType === 'individual' ? regTitle : undefined,
+      firstName: regType === 'individual' ? regFirstName : undefined,
+      middleName: regType === 'individual' ? regMiddleName : undefined,
+      surname: regType === 'individual' ? regSurname : undefined,
+      name: combinedName,
+      companyName: regType === 'company' ? regCompanyName : undefined,
+      companyRegistrationNumber: regType === 'company' ? regCompanyRegNumber : undefined,
+      nationalId: regType === 'individual' ? regNationalId : undefined,
+      role: regRole || 'Agent / Partner',
+      phone: regPhone,
+      email: regEmail,
+      preferredPassword: regPassword,
+      notes: regNotes || 'Verification entry and agency credentials application.',
+      idCardPhoto: regIdPhoto || undefined,
+      companyCertificatePhoto: regDocPhoto || undefined,
       status: 'pending',
-      submittedAt: new Date().toLocaleDateString()
+      submittedAt: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      ipAddress: '196.223.14.89 (Verified Client)',
+      deviceTrustScore: Math.floor(92 + Math.random() * 8)
     };
 
     setRegistrationRequests(prev => [newRequest, ...prev]);
@@ -518,15 +567,15 @@ export const SellerView: React.FC<SellerViewProps> = ({
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-          <div className="lg:col-span-6 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-secondary/10 text-secondary rounded-full text-xs font-black uppercase tracking-widest border border-secondary/20">
+          <div className="lg:col-span-6 space-y-6 flex flex-col items-center text-center">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-secondary/10 text-secondary rounded-full text-xs font-black uppercase tracking-widest border border-secondary/20 justify-center">
               <Shield className="w-4 h-4 shrink-0" /> Verified Onboarding Registry
             </div>
-            <h1 className="text-4xl md:text-6xl font-black text-primary tracking-tighter col-span-1 leading-none">
-              List on Gambia's <br />
+            <h1 className="text-4xl md:text-6xl font-black text-primary tracking-tighter col-span-1 leading-none text-center">
+              List on the World's <br />
               <span className="text-secondary italic">Safest Marketplace.</span>
             </h1>
-            <p className="text-lg text-on-surface-variant/85 leading-relaxed font-medium">
+            <p className="text-lg text-on-surface-variant/85 leading-relaxed font-medium text-center">
               To guarantee zero fraudulent listings and assure diaspora buyers we hold sellers accountably verified, all agents must obtain Administrator approved credentials before posting properties.
             </p>
             
@@ -602,7 +651,7 @@ export const SellerView: React.FC<SellerViewProps> = ({
                       {isRegisterMode ? 'Apply for Verification' : 'Verified Agent Sign In'}
                     </h2>
                     <p className="text-xs font-bold text-on-surface-variant/55 uppercase tracking-widest mt-1">
-                      {isRegisterMode ? 'Gambia Estate Account Registration Form' : 'Login using credentials generated by Administrator'}
+                      {isRegisterMode ? 'Diaspora Homes Agency Registration Form' : 'Login using credentials generated by Administrator'}
                     </p>
                   </div>
 
@@ -676,77 +725,268 @@ export const SellerView: React.FC<SellerViewProps> = ({
                     </form>
                   ) : (
                     /* APPLY REGISTRATION FORM */
-                    <form onSubmit={handleApplyRequest} className="space-y-4">
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant ml-1">Full Name</label>
-                        <input 
-                          required
-                          type="text" 
-                          placeholder="e.g. John Doe / Global Agency"
-                          className="w-full bg-background border border-surface-variant/10 rounded-xl px-5 py-3 text-sm focus:ring-2 focus:ring-primary/25 outline-none font-medium"
-                          value={formData.name || ''}
-                          onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        />
+                    <form onSubmit={handleApplyRequest} className="space-y-4 text-left">
+                      {/* 1. Entity Type Selector */}
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Entity Classification</label>
+                        <div className="grid grid-cols-2 gap-3 bg bg-primary/5 p-1 rounded-xl border border-primary/5">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setRegType('individual');
+                              setRegRole('Independent Broker');
+                            }}
+                            className={`py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${
+                              regType === 'individual' ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant/70 hover:bg-background/60'
+                            }`}
+                          >
+                            Individual Portal
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setRegType('company');
+                              setRegRole('Corporate Representative');
+                            }}
+                            className={`py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${
+                              regType === 'company' ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant/70 hover:bg-background/60'
+                            }`}
+                          >
+                            Corporate / company
+                          </button>
+                        </div>
                       </div>
 
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant ml-1">Phone Number (International)</label>
-                        <input 
-                          required
-                          type="tel" 
-                          placeholder="e.g. +44 20 7123 4567 or +220 777 7777"
-                          className="w-full bg-background border border-surface-variant/10 rounded-xl px-5 py-3 text-sm focus:ring-2 focus:ring-primary/25 outline-none font-medium"
-                          value={formData.phone || ''}
-                          onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                        />
+                      {/* 2. Differentiated Corporate Info Header */}
+                      {regType === 'company' && (
+                        <div className="p-4 bg-secondary/5 rounded-2xl border border-secondary/10 space-y-3">
+                          <p className="text-[10px] font-black text-secondary uppercase tracking-widest">A. Company Registration Details</p>
+                          <div className="space-y-3">
+                            <div className="space-y-1">
+                              <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">Corporate Registered Name*</label>
+                              <input 
+                                required
+                                type="text"
+                                placeholder="Global Realty Ltd or Premium Horizons Agency"
+                                className="w-full bg-white border border-surface-variant/20 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-primary"
+                                value={regCompanyName}
+                                onChange={(e) => setRegCompanyName(e.target.value)}
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">Tax ID / Company Incorporation Reg Number*</label>
+                              <input 
+                                required
+                                type="text"
+                                placeholder="REG-INT-2026-X812"
+                                className="w-full bg-white border border-surface-variant/20 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-primary"
+                                value={regCompanyRegNumber}
+                                onChange={(e) => setRegCompanyRegNumber(e.target.value)}
+                              />
+                            </div>
+                            {/* License document upload */}
+                            <div className="space-y-1">
+                              <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">Company Incorporation / Regulatory Certificate</label>
+                              <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-surface-variant/20 text-[10px]">
+                                <input 
+                                  type="file" 
+                                  accept="image/*"
+                                  className="hidden" 
+                                  id="cert-file"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      const r = new FileReader();
+                                      r.onload = () => setRegDocPhoto(r.result as string);
+                                      r.readAsDataURL(file);
+                                    }
+                                  }}
+                                />
+                                <label htmlFor="cert-file" className="cursor-pointer text-secondary font-black hover:underline uppercase">
+                                  {regDocPhoto ? "Certificate Added ✓" : "Upload Scanned Document"}
+                                </label>
+                                {regDocPhoto && <span className="text-[8px] bg-green-500 text-white px-2 py-0.5 rounded-full">OK</span>}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 3. Applicant Personal Information Grid */}
+                      <div className="p-4 bg-primary/5 rounded-2xl border border-primary/5 space-y-3">
+                        <p className="text-[10px] font-black text-primary uppercase tracking-widest">
+                          {regType === 'company' ? 'B. Primary Company Representative Details' : 'A. Applicant Details'}
+                        </p>
+                        
+                        {/* Name Grid Layout */}
+                        <div className="grid grid-cols-12 gap-2">
+                          <div className="col-span-3 space-y-1">
+                            <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">Title*</label>
+                            <select
+                              className="w-full bg-white border border-surface-variant/20 rounded-lg px-2 py-2 text-xs font-semibold focus:ring-2 focus:ring-primary/20 outline-none"
+                              value={regTitle}
+                              onChange={(e) => setRegTitle(e.target.value)}
+                            >
+                              <option value="Mr">Mr.</option>
+                              <option value="Mrs">Mrs.</option>
+                              <option value="Ms">Ms.</option>
+                              <option value="Dr">Dr.</option>
+                              <option value="Alh">Alh.</option>
+                              <option value="Chief">Chief</option>
+                            </select>
+                          </div>
+                          <div className="col-span-9 space-y-1">
+                            <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">First Name*</label>
+                            <input 
+                              required
+                              type="text"
+                              placeholder="John"
+                              className="w-full bg-white border border-surface-variant/20 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-primary"
+                              value={regFirstName}
+                              onChange={(e) => setRegFirstName(e.target.value)}
+                            />
+                          </div>
+                          <div className="col-span-6 space-y-1">
+                            <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">Middle Name</label>
+                            <input 
+                              type="text"
+                              placeholder="Optional"
+                              className="w-full bg-white border border-surface-variant/20 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-primary/20 outline-none font-medium text-primary"
+                              value={regMiddleName}
+                              onChange={(e) => setRegMiddleName(e.target.value)}
+                            />
+                          </div>
+                          <div className="col-span-6 space-y-1">
+                            <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">Surname*</label>
+                            <input 
+                              required
+                              type="text"
+                              placeholder="Smith"
+                              className="w-full bg-white border border-surface-variant/20 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-primary"
+                              value={regSurname}
+                              onChange={(e) => setRegSurname(e.target.value)}
+                            />
+                          </div>
+                        </div>
+
+                        {/* ID Document upload for individual */}
+                        {regType === 'individual' && (
+                          <div className="space-y-2 pt-1 border-t border-primary/5">
+                            <div className="space-y-1">
+                              <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">National ID Card / Passport ID*</label>
+                              <input 
+                                required
+                                type="text"
+                                placeholder="GMB-ID-78192-M"
+                                className="w-full bg-white border border-surface-variant/20 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-primary/20 outline-none font-bold text-primary"
+                                value={regNationalId}
+                                onChange={(e) => setRegNationalId(e.target.value)}
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">Upload ID Photograph or Passport Copy*</label>
+                              <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-surface-variant/20 text-[10px]">
+                                <input 
+                                  type="file" 
+                                  accept="image/*"
+                                  className="hidden" 
+                                  id="id-file"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      const r = new FileReader();
+                                      r.onload = () => setRegIdPhoto(r.result as string);
+                                      r.readAsDataURL(file);
+                                    }
+                                  }}
+                                />
+                                <label htmlFor="id-file" className="cursor-pointer text-secondary font-black hover:underline uppercase">
+                                  {regIdPhoto ? "ID Captured ✓" : "Upload Scanned Copy"}
+                                </label>
+                                {regIdPhoto && <span className="text-[8px] bg-green-500 text-white px-2 py-0.5 rounded-full">Verified</span>}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
 
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant ml-1">Email Address</label>
-                        <input 
-                          required
-                          type="email" 
-                          placeholder="your@email.com"
-                          className="w-full bg-background border border-surface-variant/10 rounded-xl px-5 py-3 text-sm focus:ring-2 focus:ring-primary/25 outline-none font-medium"
-                          value={formData.email || ''}
-                          onChange={(e) => setFormData({...formData, email: e.target.value})}
-                        />
-                      </div>
+                      {/* 4. Professional Credentials */}
+                      <div className="p-4 bg-background border border-surface-variant/10 rounded-2xl space-y-3.5">
+                        <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">C. Contact & Agency Parameters</p>
+                        
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="space-y-1">
+                            <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant text-wrap">International Phone*</label>
+                            <input 
+                              required
+                              type="tel"
+                              placeholder="+1 (555) 123-4567"
+                              className="w-full bg-white border border-surface-variant/20 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-primary/20 outline-none"
+                              value={regPhone}
+                              onChange={(e) => setRegPhone(e.target.value)}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">Email Address*</label>
+                            <input 
+                              required
+                              type="email"
+                              placeholder="vetted@agent.com"
+                              className="w-full bg-white border border-surface-variant/20 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-primary/20 outline-none"
+                              value={regEmail}
+                              onChange={(e) => setRegEmail(e.target.value)}
+                            />
+                          </div>
+                        </div>
 
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant ml-1">Proposed Web Password</label>
-                        <input 
-                          required
-                          type="password" 
-                          placeholder="••••••••"
-                          className="w-full bg-background border border-surface-variant/10 rounded-xl px-5 py-3 text-sm focus:ring-2 focus:ring-primary/25 outline-none font-medium"
-                          value={formData.password || ''}
-                          onChange={(e) => setFormData({...formData, password: e.target.value})}
-                        />
-                      </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="space-y-1">
+                            <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">Broker / Agent Role*</label>
+                            <input 
+                              required
+                              type="text"
+                              placeholder="e.g. Managing Broker"
+                              className="w-full bg-white border border-surface-variant/20 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-primary"
+                              value={regRole}
+                              onChange={(e) => setRegRole(e.target.value)}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">Proposed Passkey*</label>
+                            <input 
+                              required
+                              type="password"
+                              placeholder="••••••••"
+                              className="w-full bg-white border border-surface-variant/20 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-primary/20 outline-none"
+                              value={regPassword}
+                              onChange={(e) => setRegPassword(e.target.value)}
+                            />
+                          </div>
+                        </div>
 
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant ml-1">Brief Onboarding Note</label>
-                        <textarea 
-                          required
-                          rows={2}
-                          placeholder="e.g. licensed broker holding 4 properties internationally or locally"
-                          className="w-full bg-background border border-surface-variant/10 rounded-xl px-5 py-3 text-sm focus:ring-2 focus:ring-primary/25 outline-none font-medium resize-none"
-                          value={tempRegName}
-                          onChange={(e) => setTempRegName(e.target.value)}
-                        />
+                        <div className="space-y-1">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">Brief Onboarding Note & Fraud Prevention details*</label>
+                          <textarea 
+                            required
+                            rows={2}
+                            placeholder="State years of experience, regional licensing details or local escrow connections to aid fast validation reviews..."
+                            className="w-full bg-white border border-surface-variant/20 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-primary/20 outline-none resize-none"
+                            value={regNotes}
+                            onChange={(e) => setRegNotes(e.target.value)}
+                          />
+                        </div>
                       </div>
 
                       <button 
                         type="submit"
-                        className="w-full bg-secondary text-white py-4 rounded-xl font-bold text-sm hover:shadow-lg transition-all mt-2"
+                        className="w-full bg-secondary text-white py-4 rounded-2xl font-bold text-xs uppercase tracking-widest hover:shadow-lg transition-all mt-2"
                       >
                         Submit Verification Request
                       </button>
 
                       <div className="text-center pt-2">
                         <p className="text-xs text-on-surface-variant/70">
-                          Already have credentials?{' '}
+                          Already registered?{' '}
                           <button 
                             type="button" 
                             onClick={() => { setIsRegisterMode(false); setAuthError(''); }}
@@ -1594,7 +1834,7 @@ export const SellerView: React.FC<SellerViewProps> = ({
                     <div className="relative">
                       <input 
                         type="text" 
-                        placeholder="2207777777"
+                        placeholder="15551234567"
                         className="w-full bg-background border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-primary/20 outline-none font-medium pl-14"
                         value={formData.whatsapp || ''}
                         onChange={(e) => setFormData({...formData, whatsapp: e.target.value})}
@@ -1606,7 +1846,7 @@ export const SellerView: React.FC<SellerViewProps> = ({
                     <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant ml-1">Public Phone</label>
                     <input 
                       type="text" 
-                      placeholder="2203333333"
+                      placeholder="15559876543"
                       className="w-full bg-background border-none rounded-xl px-6 py-4 focus:ring-2 focus:ring-primary/20 outline-none font-medium"
                       value={formData.phone || ''}
                       onChange={(e) => setFormData({...formData, phone: e.target.value})}

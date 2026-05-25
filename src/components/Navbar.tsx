@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Search, Bell, MessageSquare, User, Menu, Globe } from 'lucide-react';
+import { Search, Bell, MessageSquare, User, Menu, Globe, Languages } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CURRENCIES, CurrencyCode } from '../types';
+import { Language, translations } from '../lib/translations';
 
 interface NavbarProps {
   onSellClick: () => void;
@@ -9,12 +10,15 @@ interface NavbarProps {
   onBuyClick: () => void;
   onRentClick: () => void;
   onAdminClick: () => void;
-  currentView: 'home' | 'details' | 'sell' | 'browse' | 'admin';
+  onServicesClick?: () => void;
+  currentView: 'home' | 'details' | 'sell' | 'browse' | 'admin' | 'services';
   searchQuery: string;
   onSearchChange: (query: string) => void;
   isScrolled?: boolean;
   selectedCurrency: CurrencyCode;
   onCurrencyChange: (currency: CurrencyCode) => void;
+  language: Language;
+  onLanguageChange: (lang: Language) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ 
@@ -23,21 +27,28 @@ export const Navbar: React.FC<NavbarProps> = ({
   onBuyClick, 
   onRentClick, 
   onAdminClick,
+  onServicesClick,
   currentView,
   searchQuery,
   onSearchChange,
   isScrolled = false,
   selectedCurrency,
-  onCurrencyChange
+  onCurrencyChange,
+  language,
+  onLanguageChange
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
+  const [isLanguageOpen, setIsLanguageOpen] = useState(false);
+
+  const t = translations[language];
 
   const navLinks = [
-    { label: 'Home', onClick: () => { onLogoClick(); setIsMenuOpen(false); }, active: currentView === 'home' },
-    { label: 'Buy/Rent', onClick: () => { onBuyClick(); setIsMenuOpen(false); }, active: currentView === 'browse' },
-    { label: 'Sell', onClick: () => { onSellClick(); setIsMenuOpen(false); }, active: currentView === 'sell' },
-    { label: 'Admin', onClick: () => { onAdminClick(); setIsMenuOpen(false); }, active: currentView === 'admin' },
+    { label: t.home, onClick: () => { onLogoClick(); setIsMenuOpen(false); }, active: currentView === 'home' },
+    { label: t.buyRent, onClick: () => { onBuyClick(); setIsMenuOpen(false); }, active: currentView === 'browse' },
+    { label: t.services, onClick: () => { onServicesClick?.(); setIsMenuOpen(false); }, active: currentView === 'services' },
+    { label: t.sell, onClick: () => { onSellClick(); setIsMenuOpen(false); }, active: currentView === 'sell' },
+    { label: t.admin, onClick: () => { onAdminClick(); setIsMenuOpen(false); }, active: currentView === 'admin' },
   ];
 
   const headerStyles = currentView === 'home' 
@@ -60,7 +71,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </span>
       </div>
 
-      <nav className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
+      <nav className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
         {navLinks.map((link) => (
           <button 
             key={link.label}
@@ -84,19 +95,72 @@ export const Navbar: React.FC<NavbarProps> = ({
         ))}
       </nav>
       
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2.5">
+        {/* Language Selector */}
+        <div className="relative">
+          <button 
+            onClick={() => {
+              setIsLanguageOpen(!isLanguageOpen);
+              setIsCurrencyOpen(false);
+            }}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-full transition-all border font-bold text-xs uppercase tracking-wider ${
+              currentView === 'home' && !isScrolled 
+                ? 'bg-white/10 border-white/20 text-white hover:bg-white/20' 
+                : 'bg-background border-surface-variant/20 text-primary hover:bg-surface-variant/10'
+            }`}
+          >
+            <Languages className="w-3.5 h-3.5" />
+            <span>{language}</span>
+          </button>
+
+          <AnimatePresence>
+            {isLanguageOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                className="absolute right-0 mt-2 w-44 bg-white rounded-2xl shadow-2xl border border-surface-variant/10 p-2 z-[10000]"
+              >
+                {[
+                  { code: 'en', label: 'English (EN)' },
+                  { code: 'fr', label: 'Français (FR)' },
+                  { code: 'es', label: 'Español (ES)' }
+                ].map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => {
+                      onLanguageChange(lang.code as Language);
+                      setIsLanguageOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-black transition-all ${
+                      language === lang.code 
+                        ? 'bg-primary text-white shadow-md' 
+                        : 'text-on-surface-variant hover:bg-surface-variant/10'
+                    }`}
+                  >
+                    <span>{lang.label}</span>
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
         {/* Currency Selector */}
         <div className="relative">
           <button 
-            onClick={() => setIsCurrencyOpen(!isCurrencyOpen)}
-            className={`flex items-center gap-2 px-3 py-2 rounded-full transition-all border font-bold text-xs ${
+            onClick={() => {
+              setIsCurrencyOpen(!isCurrencyOpen);
+              setIsLanguageOpen(false);
+            }}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-full transition-all border font-bold text-xs ${
               currentView === 'home' && !isScrolled 
                 ? 'bg-white/10 border-white/20 text-white hover:bg-white/20' 
                 : 'bg-background border-surface-variant/20 text-primary hover:bg-surface-variant/10'
             }`}
           >
             <Globe className="w-3.5 h-3.5" />
-            {selectedCurrency}
+            <span>{selectedCurrency}</span>
           </button>
 
           <AnimatePresence>
@@ -129,7 +193,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </AnimatePresence>
         </div>
 
-        <div className={`hidden md:flex rounded-full px-4 py-2 items-center gap-2 border transition-all ${
+        <div className={`hidden lg:flex rounded-full px-4 py-2 items-center gap-2 border transition-all ${
           currentView === 'home' && !isScrolled 
             ? 'bg-white/10 border-white/20' 
             : 'bg-background border-surface-variant/20'
@@ -139,7 +203,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className={`bg-transparent border-none focus:ring-0 text-sm w-48 font-sans outline-none ${
               currentView === 'home' && !isScrolled ? 'text-white placeholder:text-white/40' : 'text-on-surface'
             }`} 
-            placeholder="Search properties..." 
+            placeholder={t.searchPlaceholder} 
             type="text"
             value={searchQuery}
             onChange={(e) => {
@@ -154,7 +218,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex gap-1">
           <button 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className={`md:hidden p-2 rounded-full transition-all ${
+            className={`lg:hidden p-2 rounded-full transition-all ${
               currentView === 'home' && !isScrolled 
                 ? 'hover:bg-white/10' 
                 : 'hover:bg-surface-variant/30'
@@ -172,7 +236,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="absolute top-full left-0 right-0 bg-white border-b border-surface-variant/10 p-6 flex flex-col gap-4 md:hidden shadow-2xl"
+            className="absolute top-full left-0 right-0 bg-white border-b border-surface-variant/10 p-6 flex flex-col gap-4 lg:hidden shadow-2xl"
           >
             {navLinks.map((link) => (
               <button
@@ -189,7 +253,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Search className="w-5 h-5 text-on-surface-variant" />
               <input 
                 className="bg-transparent border-none focus:ring-0 text-base w-full font-sans outline-none" 
-                placeholder="Search properties..." 
+                placeholder={t.searchPlaceholder} 
                 type="text"
                 value={searchQuery}
                 onChange={(e) => {

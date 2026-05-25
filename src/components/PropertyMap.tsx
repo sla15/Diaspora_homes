@@ -52,6 +52,14 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
   const [mapCenter, setMapCenter] = useState<[number, number]>(initialCenter);
   const [mapZoom, setMapZoom] = useState(initialZoom);
 
+  React.useEffect(() => {
+    setMapCenter(initialCenter);
+  }, [initialCenter]);
+
+  React.useEffect(() => {
+    setMapZoom(initialZoom);
+  }, [initialZoom]);
+
   const allMarkers = useMemo(() => {
     const poiMarkers = POIS.map(poi => ({
       position: poi.coordinates,

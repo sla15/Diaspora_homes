@@ -6,10 +6,14 @@ import { PropertyMap } from './components/PropertyMap';
 import { SellerView } from './components/SellerView';
 import { BrowseView } from './components/BrowseView';
 import { AdminView } from './components/AdminView';
+import { ServiceProviderView, INITIAL_SERVICE_PROVIDERS } from './components/ServiceProviderView';
 import { PROPERTIES, Property, CURRENCIES, CurrencyCode } from './types';
-import { Search, Home, SlidersHorizontal, CreditCard, TrendingUp, Mail, User, ArrowRight, ChevronDown, Maximize, Building2, MessageCircle, X, Check, ChevronRight } from 'lucide-react';
+import { Search, Home, SlidersHorizontal, CreditCard, TrendingUp, Mail, User, ArrowRight, ChevronDown, Maximize, Building2, MessageCircle, X, Check, ChevronRight, Wrench, Star, ShieldCheck, HardHat, MapPin, Briefcase, Phone } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useEffect } from 'react';
+import { Language, translations } from './lib/translations';
+import { useLocalStorage } from './hooks/useLocalStorage';
+import { ServiceProvider } from './components/ServiceProviderView';
 
 const STORAGE_KEY = 'the_digital_estate_listings';
 const REGISTRATION_STORAGE_KEY = 'diaspora_registration_requests';
@@ -58,7 +62,7 @@ const DEFAULT_REGISTRATIONS = [
     id: 'req-4',
     name: 'Amadou Diallo',
     phone: '2209999999',
-    email: 'amadou@gambia-estate.com',
+    email: 'amadou@world-estates.com',
     preferredPassword: 'amadou-secret',
     notes: 'Local landlord looking to post rental units in Fajara.',
     status: 'more_info' as const,
@@ -141,16 +145,40 @@ export default function App() {
     localStorage.setItem(INQUIRIES_STORAGE_KEY, JSON.stringify(supportInquiries));
   }, [supportInquiries]);
 
-  const [view, setView] = useState<'home' | 'details' | 'sell' | 'browse' | 'admin'>('home');
+  const [view, setView] = useState<'home' | 'details' | 'sell' | 'browse' | 'admin' | 'services'>('home');
   const [browseType, setBrowseType] = useState<'buy' | 'rent'>('buy');
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [heroPropertyType, setHeroPropertyType] = useState('');
   const [isSellerLoggedIn, setIsSellerLoggedIn] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('GMD');
+  const [selectedCurrency, setSelectedCurrency] = useLocalStorage<CurrencyCode>('diaspora_selected_currency', 'USD');
   const [showContactForm, setShowContactForm] = useState(false);
   const [contactFormStatus, setContactFormStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+
+  // Multi-lingual & Map Geolocation States
+  const [language, setLanguage] = useState<Language>('en');
+  const [userLocation, setUserLocation] = useState<[number, number]>([13.4432, -16.6466]); // Default fallback
+  const [mapZoom, setMapZoom] = useState<number>(2); // Start global, zoom in when localized
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation([position.coords.latitude, position.coords.longitude]);
+          setMapZoom(12);
+        },
+        (error) => {
+          console.warn("Geolocation permission or device error, using fallback property location:", error);
+          if (properties.length > 0) {
+            setUserLocation(properties[0].coordinates);
+            setMapZoom(7);
+          }
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
+      );
+    }
+  }, [properties]);
 
   // New binding states for contact inputs
   const [contactEmail, setContactEmail] = useState('');
@@ -211,12 +239,15 @@ export default function App() {
           onBuyClick={() => handleBrowse('buy')}
           onRentClick={() => handleBrowse('rent')}
           onAdminClick={() => { setView('admin'); window.scrollTo(0, 0); }}
+          onServicesClick={() => { setView('services'); window.scrollTo(0, 0); }}
           currentView={view}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           isScrolled={isScrolled}
           selectedCurrency={selectedCurrency}
           onCurrencyChange={setSelectedCurrency}
+          language={language}
+          onLanguageChange={setLanguage}
         />
       )}
       
@@ -244,9 +275,8 @@ export default function App() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
                   >
-                    <h1 className="text-5xl md:text-8xl font-black text-white tracking-tighter mb-12 leading-[0.9] font-headline">
-                      Find your piece of <br/>
-                      <span className="text-secondary italic">The World.</span>
+                    <h1 className="text-5xl md:text-8xl font-black text-white tracking-tighter mb-12 leading-[0.9] font-headline text-center">
+                      {translations[language].heroTitle}
                     </h1>
                   </motion.div>
                   
@@ -261,7 +291,7 @@ export default function App() {
                       <Search className="w-6 h-6 text-primary" />
                       <input 
                         className="w-full bg-transparent border-none focus:ring-0 text-on-surface font-bold py-4 outline-none text-lg placeholder:text-on-surface-variant/40" 
-                        placeholder="Search by neighborhood..." 
+                        placeholder={translations[language].heroPlaceholder} 
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -275,7 +305,7 @@ export default function App() {
                           options={propertyTypeOptions}
                           value={heroPropertyType}
                           onChange={setHeroPropertyType}
-                          placeholder="Property Type"
+                          placeholder={language === 'fr' ? 'Type de Bien' : language === 'es' ? 'Tipo de Propiedad' : 'Property Type'}
                           className="w-full border-none !bg-transparent"
                         />
                       </div>
@@ -285,7 +315,7 @@ export default function App() {
                       onClick={() => handleBrowse('buy')}
                       className="bg-primary text-white px-12 py-5 rounded-2xl md:rounded-full font-black text-lg hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-primary/20"
                     >
-                      Search
+                      {translations[language].discoverSanctuary}
                     </button>
                   </motion.div>
                 </div>
@@ -297,76 +327,82 @@ export default function App() {
 
               {/* Quick Navigation */}
               <section className="px-6 mb-16 max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                  {/* Buy Card */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                  {/* Buy Card - Ultimate Anchor */}
                   <motion.div 
                     whileHover={{ y: -10 }}
                     onClick={() => {
                       setHeroPropertyType('any');
                       handleBrowse('buy');
                     }}
-                    className="group bg-white rounded-[2.5rem] p-10 cursor-pointer border border-surface-variant/20 shadow-2xl shadow-primary/5 relative overflow-hidden"
+                    className="group bg-white rounded-[2.5rem] p-8 md:p-12 cursor-pointer border border-surface-variant/20 shadow-2xl shadow-primary/5 relative overflow-hidden flex flex-col justify-between min-h-[340px] md:min-h-[420px] md:col-span-2 md:row-span-2 max-md:sticky max-md:top-[80px] z-[10]"
                   >
                     <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform">
-                      <Search className="w-24 h-24" />
+                      <Search className="w-36 h-36" />
                     </div>
-                    <div className="w-16 h-16 rounded-[2rem] bg-primary/10 flex items-center justify-center text-primary mb-8">
-                      <Search className="w-8 h-8" />
+                    <div>
+                      <div className="w-16 h-16 rounded-[2rem] bg-primary/10 flex items-center justify-center text-primary mb-8">
+                        <Search className="w-8 h-8" />
+                      </div>
+                      <h3 className="text-3xl md:text-4xl font-black text-primary mb-4 leading-tight">{translations[language].buyCardTitle}</h3>
+                      <p className="text-on-surface-variant font-bold text-sm md:text-base leading-relaxed opacity-70 max-w-sm">
+                        {translations[language].buyCardDesc}
+                      </p>
                     </div>
-                    <h3 className="text-3xl font-black text-primary mb-4 leading-none">Buy Premium</h3>
-                    <p className="text-on-surface-variant font-bold text-sm leading-relaxed mb-6 opacity-70">
-                      Explore our curated collection of verified villas and high-end estates.
-                    </p>
-                    <div className="flex items-center gap-3 text-secondary font-black text-xs uppercase tracking-widest">
-                      View Listings <ArrowRight className="w-4 h-4" />
+                    <div className="flex items-center gap-3 text-secondary font-black text-xs uppercase tracking-widest mt-8">
+                      {translations[language].browseListing} <ArrowRight className="w-4 h-4" />
                     </div>
                   </motion.div>
 
-                  {/* Rent Card */}
+                  {/* Rent Card - Secondary Anchor */}
                   <motion.div 
                     whileHover={{ y: -10 }}
                     onClick={() => {
                       setHeroPropertyType('any');
                       handleBrowse('rent');
                     }}
-                    className="group bg-secondary rounded-[2.5rem] p-10 cursor-pointer shadow-2xl shadow-secondary/20 relative overflow-hidden text-white"
+                    className="group bg-secondary rounded-[2.5rem] p-8 md:p-10 cursor-pointer shadow-2xl shadow-secondary/20 relative overflow-hidden text-white flex flex-col justify-between md:col-span-2 min-h-[200px] max-md:sticky max-md:top-[104px] z-[20]"
                   >
-                    <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
+                    <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:scale-110 transition-transform">
                       <Home className="w-24 h-24" />
                     </div>
-                    <div className="w-16 h-16 rounded-[2rem] bg-white/10 flex items-center justify-center text-white mb-8">
-                      <Home className="w-8 h-8" />
+                    <div>
+                      <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-white mb-6">
+                        <Home className="w-6 h-6" />
+                      </div>
+                      <h3 className="text-2xl md:text-3xl font-black mb-3 leading-none text-white">{translations[language].rentCardTitle}</h3>
+                      <p className="text-surface-variant/60 font-medium text-xs md:text-sm leading-relaxed opacity-75 max-w-md">
+                        {translations[language].rentCardDesc}
+                      </p>
                     </div>
-                    <h3 className="text-3xl font-black mb-4 leading-none text-white">Elite Rentals</h3>
-                    <p className="text-surface-variant/60 font-bold text-sm leading-relaxed mb-6 opacity-70">
-                      Discover exclusive long-term stays and luxury short-term holiday homes.
-                    </p>
-                    <div className="flex items-center gap-3 text-white font-black text-xs uppercase tracking-widest">
-                      Explore rentals <ArrowRight className="w-4 h-4" />
+                    <div className="flex items-center gap-3 text-white font-black text-xs uppercase tracking-widest mt-6">
+                      {translations[language].browseListing} <ArrowRight className="w-4 h-4" />
                     </div>
                   </motion.div>
 
-                  {/* Land Card */}
+                  {/* Agents Card */}
                   <motion.div 
                     whileHover={{ y: -10 }}
                     onClick={() => {
-                      setHeroPropertyType('land');
-                      handleBrowse('buy');
+                      setView('services');
+                      window.scrollTo(0, 0);
                     }}
-                    className="group bg-white rounded-[2.5rem] p-10 cursor-pointer border border-surface-variant/20 shadow-2xl shadow-primary/5 relative overflow-hidden"
+                    className="group bg-white rounded-[2.5rem] p-6 md:p-8 cursor-pointer border border-surface-variant/20 shadow-2xl shadow-primary/5 relative overflow-hidden flex flex-col justify-between md:col-span-1 min-h-[200px] max-md:sticky max-md:top-[128px] z-[30]"
                   >
-                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform">
-                      <Maximize className="w-24 h-24" />
+                    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
+                      <User className="w-16 h-16" />
                     </div>
-                    <div className="w-16 h-16 rounded-[2rem] bg-secondary/10 flex items-center justify-center text-secondary mb-8">
-                      <Maximize className="w-8 h-8" />
+                    <div>
+                      <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary mb-4">
+                        <User className="w-5 h-5" />
+                      </div>
+                      <h3 className="text-xl font-black text-primary mb-2 leading-none">{translations[language].agentsCardTitle}</h3>
+                      <p className="text-on-surface-variant font-medium text-xs leading-relaxed opacity-70">
+                        {translations[language].agentsCardDesc}
+                      </p>
                     </div>
-                    <h3 className="text-3xl font-black text-primary mb-4 leading-none">Plots of Land</h3>
-                    <p className="text-on-surface-variant font-bold text-sm leading-relaxed mb-6 opacity-70">
-                      Invest in premium residential and agricultural lands across prime locations.
-                    </p>
-                    <div className="flex items-center gap-3 text-secondary font-black text-xs uppercase tracking-widest">
-                      View Plots <ArrowRight className="w-4 h-4" />
+                    <div className="flex items-center gap-2 text-secondary font-black text-[10px] uppercase tracking-wider mt-4">
+                      {translations[language].meetAgents} <ArrowRight className="w-3.5 h-3.5" />
                     </div>
                   </motion.div>
 
@@ -377,33 +413,66 @@ export default function App() {
                       setHeroPropertyType('commercial');
                       handleBrowse('buy');
                     }}
-                    className="group bg-primary text-white rounded-[2.5rem] p-10 cursor-pointer shadow-2xl shadow-primary/20 relative overflow-hidden"
+                    className="group bg-primary text-white rounded-[2.5rem] p-6 md:p-8 cursor-pointer shadow-2xl shadow-primary/20 relative overflow-hidden flex flex-col justify-between md:col-span-1 min-h-[200px] max-md:sticky max-md:top-[152px] z-[40]"
                   >
-                    <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
-                      <Building2 className="w-24 h-24" />
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                      <Building2 className="w-16 h-16" />
                     </div>
-                    <div className="w-16 h-16 rounded-[2rem] bg-white/10 flex items-center justify-center text-white mb-8">
-                      <Building2 className="w-8 h-8" />
+                    <div>
+                      <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white mb-4">
+                        <Building2 className="w-5 h-5" />
+                      </div>
+                      <h3 className="text-xl font-black mb-2 leading-none text-white">{translations[language].hubsCardTitle}</h3>
+                      <p className="text-surface-variant/60 font-medium text-xs leading-relaxed opacity-70">
+                        {translations[language].hubsCardDesc}
+                      </p>
                     </div>
-                    <h3 className="text-3xl font-black mb-4 leading-none text-white">Commercial</h3>
-                    <p className="text-surface-variant/60 font-bold text-sm leading-relaxed mb-6 opacity-70">
-                      Modern business centers and retail spaces for corporate growth.
-                    </p>
-                    <div className="flex items-center gap-3 text-white font-black text-xs uppercase tracking-widest">
-                      Business Hubs <ArrowRight className="w-4 h-4" />
+                    <div className="flex items-center gap-2 text-white font-black text-[10px] uppercase tracking-wider mt-4">
+                      {translations[language].exploreOffices} <ArrowRight className="w-3.5 h-3.5" />
+                    </div>
+                  </motion.div>
+
+                  {/* Service Provider Card - Footer Feature Anchor */}
+                  <motion.div 
+                    whileHover={{ y: -10 }}
+                    onClick={() => {
+                      setView('services');
+                      window.scrollTo(0, 0);
+                    }}
+                    className="group bg-black text-white rounded-[2.5rem] p-8 md:p-10 cursor-pointer shadow-2xl relative overflow-hidden flex flex-col justify-between md:flex-row md:items-center min-h-[160px] md:col-span-4 max-md:sticky max-md:top-[176px] z-[50]"
+                  >
+                    <div className="absolute top-0 right-0 p-8 opacity-15 group-hover:scale-110 transition-transform">
+                      <Wrench className="w-24 h-24" />
+                    </div>
+                    <div className="max-w-2xl">
+                      <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-white mb-6 md:mb-4">
+                        <Wrench className="w-6 h-6" />
+                      </div>
+                      <h3 className="text-2xl md:text-3xl font-black mb-2 leading-none text-white">{translations[language].vettedCrewCardTitle}</h3>
+                      <p className="text-neutral-400 font-medium text-xs md:text-sm leading-relaxed max-w-xl">
+                        {translations[language].vettedCrewCardDesc}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3 text-white font-black text-xs uppercase tracking-widest mt-6 md:mt-0 bg-white/10 hover:bg-white/20 px-6 py-4 rounded-2xl self-start md:self-center transition-all">
+                      {translations[language].findCrew} <ArrowRight className="w-4 h-4" />
                     </div>
                   </motion.div>
                 </div>
               </section>
 
               {/* Featured Listings */}
-              <section className="px-6 mb-12 max-w-7xl mx-auto flex items-center justify-between">
-                <h2 className="text-3xl font-black text-primary tracking-tight">Featured Listings</h2>
+              <section className="px-6 mb-12 max-w-7xl mx-auto text-center flex flex-col items-center justify-center">
+                <h2 className="text-3xl font-black text-primary tracking-tight mb-2">
+                  {translations[language].featuredPropertiesTitle}
+                </h2>
+                <p className="text-on-surface-variant font-medium text-sm max-w-2xl mb-6">
+                  {translations[language].featuredPropertiesDesc}
+                </p>
                 <button 
                   onClick={() => handleBrowse('buy')}
-                  className="text-primary font-bold flex items-center gap-2 hover:gap-3 transition-all"
+                  className="text-primary font-bold flex items-center gap-2 hover:gap-3 transition-all border border-surface-variant/20 px-6 py-2.5 rounded-full"
                 >
-                  View All <ArrowRight className="w-5 h-5" />
+                  {language === 'fr' ? 'Voir Tout' : language === 'es' ? 'Ver Todo' : 'View All'} <ArrowRight className="w-5 h-5" />
                 </button>
               </section>
 
@@ -432,14 +501,18 @@ export default function App() {
 
               {/* Explore Section */}
               <section className="mt-24 px-6 max-w-7xl mx-auto">
-                <div className="mb-12">
-                  <h2 className="text-4xl font-extrabold text-primary tracking-tight mb-4">Explore Global Destinations</h2>
-                  <p className="text-on-surface-variant text-lg max-w-2xl">Discover landmarks, markets, and natural wonders across the world. Use our interactive map to find points of interest near your future home.</p>
+                <div className="mb-12 text-center flex flex-col items-center justify-center">
+                  <h2 className="text-4xl font-extrabold text-primary tracking-tight mb-4 text-center">
+                    {translations[language].exploreDestinations}
+                  </h2>
+                  <p className="text-on-surface-variant text-lg max-w-2xl text-center">
+                    {translations[language].exploreDestinationsSub}
+                  </p>
                 </div>
                 <div className="h-[600px] rounded-[2.5rem] overflow-hidden shadow-2xl border border-surface-variant/10 relative">
                   <PropertyMap 
-                    center={[13.4432, -16.6466]} 
-                    zoom={11} 
+                    center={userLocation} 
+                    zoom={mapZoom} 
                     showSearch={true}
                     markers={properties.map(p => ({
                       position: p.coordinates,
@@ -447,6 +520,89 @@ export default function App() {
                       type: 'property'
                     }))}
                   />
+                </div>
+              </section>
+
+              {/* Vetted Local Experts & Service Providers Section */}
+              <section className="mt-24 px-6 max-w-7xl mx-auto">
+                <div className="mb-12 text-center flex flex-col items-center justify-center">
+                  <h2 className="text-3xl md:text-5xl font-black text-primary tracking-tight mb-4 text-center">
+                    {translations[language].vettedProvidersTitle}
+                  </h2>
+                  <p className="text-on-surface-variant text-base font-medium max-w-2xl text-center leading-relaxed">
+                    {translations[language].vettedProvidersDesc}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                  {INITIAL_SERVICE_PROVIDERS.slice(0, 2).map((provider, idx) => (
+                    <motion.div
+                      key={provider.id}
+                      whileHover={{ y: -8, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.05), 0 10px 10px -5px rgba(0,0,0,0.04)' }}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: idx * 0.1 }}
+                      className="bg-white rounded-3xl p-6 border border-surface-variant/20 flex flex-col justify-between shadow-sm relative overflow-hidden group hover:border-secondary/30 transition-colors"
+                    >
+                      <div className="flex flex-col justify-between h-full">
+                        <div>
+                          {/* Specialty & Location */}
+                          <div className="flex items-center justify-between gap-2 mb-4">
+                            <span className="text-[10px] font-black uppercase tracking-widest bg-primary/5 text-primary px-3 py-1 rounded-full whitespace-nowrap">
+                              {provider.specialty}
+                            </span>
+                          </div>
+
+                          {/* Title & Role */}
+                          <h3 className="text-lg font-black text-primary mb-1 group-hover:text-secondary transition-colors line-clamp-1">
+                            {provider.name}
+                          </h3>
+                          <p className="text-xs font-bold text-on-surface-variant/70 mb-3">{provider.role}</p>
+
+                          {/* Location */}
+                          <div className="flex items-center gap-1.5 text-on-surface-variant/60 text-xs font-semibold mb-3">
+                            <MapPin className="w-3.5 h-3.5 text-secondary shrink-0" />
+                            <span className="truncate">{provider.location}</span>
+                          </div>
+
+                          {/* Bio Note */}
+                          <p className="text-xs text-on-surface-variant/80 font-medium line-clamp-3 leading-relaxed mt-3 mb-4">
+                            {provider.notes}
+                          </p>
+                        </div>
+
+                        {/* Request Quote Button */}
+                        <a
+                          href={`https://wa.me/${provider.phone.replace(/\D/g, '')}?text=${encodeURIComponent(
+                            `Hi ${provider.name}, I found your profile on Diaspora Real Estate under directory category "${provider.specialty}". I would like to request a quote for your professional services.`
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                          className="w-full mt-2 bg-secondary hover:bg-secondary/95 text-white py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-secondary/10 transition-all hover:scale-[1.02] active:scale-95 text-center"
+                        >
+                          <MessageCircle className="w-3.5 h-3.5" />
+                          <span>Request Quote</span>
+                        </a>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+
+                <div className="flex justify-center mt-12 mb-4">
+                  <button
+                    onClick={() => {
+                      setView('services');
+                      window.scrollTo(0, 0);
+                    }}
+                    className="inline-flex items-center gap-3 bg-primary hover:bg-primary/95 text-white px-8 py-4 rounded-full font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/10 transition-all hover:scale-[1.02] active:scale-95 border border-primary/20"
+                  >
+                    <span>{translations[language].viewFullDirectory}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
                 </div>
               </section>
 
@@ -497,6 +653,11 @@ export default function App() {
               selectedCurrency={selectedCurrency}
               allProperties={properties}
               onPropertyClick={handlePropertySelect}
+            />
+          ) : view === 'services' ? (
+            <ServiceProviderView
+              key="services"
+              onBack={handleBackToHome}
             />
           ) : view === 'admin' ? (
             <AdminView
@@ -694,6 +855,7 @@ export default function App() {
           </div>
         )}
       </AnimatePresence>
+
     </div>
   );
 }

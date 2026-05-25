@@ -88,15 +88,15 @@ export const BrowseView: React.FC<BrowseViewProps> = ({
     <div className="min-h-screen bg-background pt-12 pb-24 overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         {/* Header & Type Toggle */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12 md:mb-16">
-          <div className="space-y-2">
-            <h1 className="text-3xl md:text-6xl font-black text-primary tracking-tighter leading-none">
+        <div className="flex flex-col items-center justify-center text-center gap-6 mb-12 md:mb-16 max-w-4xl mx-auto">
+          <div className="space-y-4 text-center flex flex-col items-center">
+            <h1 className="text-3xl md:text-6xl font-black text-primary tracking-tighter leading-none text-center">
               {activeType === 'buy' ? 'Properties for Sale' : 'Properties for Rent'}
             </h1>
-            <p className="text-base md:text-lg text-on-surface-variant font-bold">
+            <p className="text-base md:text-lg text-on-surface-variant font-bold text-center">
               Discover {filteredProperties.length} verified listings <span className="text-secondary italic">Globally.</span>
             </p>
-            <div className="flex flex-wrap gap-2 mt-4 md:mt-6">
+            <div className="flex flex-wrap items-center justify-center gap-2 mt-4 md:mt-6">
               {propertyTypeOptions.map((opt) => (
                 <button
                   key={opt.value}
@@ -113,7 +113,7 @@ export const BrowseView: React.FC<BrowseViewProps> = ({
             </div>
           </div>
 
-          <div className="flex bg-white p-1.5 rounded-[2rem] shadow-2xl shadow-primary/5 border border-surface-variant/10 self-start">
+          <div className="flex bg-white p-1.5 rounded-[2rem] shadow-2xl shadow-primary/5 border border-surface-variant/10">
             <button 
               onClick={() => setActiveType('buy')}
               className={`px-10 py-4 rounded-[1.5rem] font-black text-sm uppercase tracking-widest transition-all ${

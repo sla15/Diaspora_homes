@@ -271,20 +271,20 @@ export const PropertyDetails: React.FC<PropertyDetailsProps> = ({
       <div className="flex flex-col lg:flex-row gap-12">
         <div className="flex-grow space-y-16 lg:max-w-[calc(100%-440px)]">
           {/* Headline & Price */}
-          <div className="space-y-6">
-            <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6">
-              <div className="space-y-2">
-                <h1 className="text-4xl md:text-6xl font-black text-primary tracking-tighter leading-none">
+          <div className="space-y-6 text-center">
+            <div className="flex flex-col items-center justify-center gap-6">
+              <div className="space-y-2 text-center">
+                <h1 className="text-4xl md:text-6xl font-black text-primary tracking-tighter leading-none text-center">
                   {property.title}
                 </h1>
-                <div className="flex items-center gap-2 text-on-surface-variant font-bold">
+                <div className="flex items-center justify-center gap-2 text-on-surface-variant font-bold mx-auto">
                   <div className="w-8 h-8 rounded-full bg-primary/5 flex items-center justify-center">
                     <MapPin className="w-4 h-4 text-primary" />
                   </div>
                   <span className="text-lg">{property.location}</span>
                 </div>
               </div>
-              <div className="bg-secondary/5 px-8 py-4 rounded-3xl border border-secondary/10 w-fit">
+              <div className="bg-secondary/5 px-8 py-4 rounded-3xl border border-secondary/10 w-fit mx-auto text-center">
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary mb-1">Asking Price</p>
                 <p className="text-4xl font-black text-secondary tracking-tight">
                   {displayPrice(property.price, selectedCurrency)}
@@ -438,7 +438,7 @@ export const PropertyDetails: React.FC<PropertyDetailsProps> = ({
             {/* Mortgage Calculator Disclaimer */}
             <div className="mt-8 pt-6 border-t border-surface-variant/10 text-left">
               <p className="text-[10px] text-on-surface-variant/40 leading-relaxed italic font-bold">
-                * Legal Disclaimer: Mortgage estimations provided by this tool are for informational purposes only. Actual interest rates, loan approvals, Down Payment requirements, and monthly payment amounts will vary according to specific credit reviews, bank terms, and insurance policies in the Republic of the Gambia. Consult with a qualified financial institution before making investment decisions.
+                * Legal Disclaimer: Mortgage estimations provided by this tool are for informational purposes only. Actual interest rates, loan approvals, Down Payment requirements, and monthly payment amounts will vary according to specific credit reviews, bank terms, and insurance policies by respective lenders in your target jurisdiction. Consult with a qualified financial institution before making investment decisions.
               </p>
             </div>
           </div>
@@ -586,7 +586,7 @@ export const PropertyDetails: React.FC<PropertyDetailsProps> = ({
                     className="p-4 bg-white rounded-3xl border border-surface-variant/10 shadow-sm hover:shadow-xl hover:bg-surface-variant/5 transition-all cursor-pointer group flex flex-col gap-4"
                   >
                     <div className="h-44 rounded-2xl overflow-hidden relative bg-surface-variant">
-                      <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" referrerPolicy="no-referrer" />
                       <span className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm shadow px-3 py-1.5 rounded-xl font-black text-[10px] uppercase tracking-wider text-primary">
                         {item.type === 'buy' ? 'For Sale' : 'For Rent'}
                       </span>
@@ -641,7 +641,7 @@ export const PropertyDetails: React.FC<PropertyDetailsProps> = ({
                   <Phone className="w-4 h-4" /> Voice Call
                 </a>
                 <a 
-                  href={`mailto:${`${property.agent.name.toLowerCase().replace(/\s+/g, '')}@gambiarealty.com`}?subject=Inquiry for ${property.title}`}
+                  href={`mailto:${`${property.agent.name.toLowerCase().replace(/\s+/g, '')}@globalrealty.com`}?subject=Inquiry for ${property.title}`}
                   className="w-full lg:max-w-[260px] bg-secondary hover:bg-secondary/95 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-secondary/10 transition-all hover:scale-[1.02] active:scale-95"
                 >
                   <Mail className="w-4 h-4" /> Email Contact
@@ -788,7 +788,7 @@ export const PropertyDetails: React.FC<PropertyDetailsProps> = ({
               <Phone className="w-4 h-4" /> Voice Call
             </a>
             <a 
-              href={`mailto:${`${property.agent.name.toLowerCase().replace(/\s+/g, '')}@gambiarealty.com`}?subject=Inquiry for ${property.title}`}
+              href={`mailto:${`${property.agent.name.toLowerCase().replace(/\s+/g, '')}@globalrealty.com`}?subject=Inquiry for ${property.title}`}
               className="flex-1 md:flex-initial bg-secondary hover:bg-secondary/95 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-secondary/10 transition-all hover:-translate-y-0.5"
             >
               <Mail className="w-4 h-4" /> Email Contact

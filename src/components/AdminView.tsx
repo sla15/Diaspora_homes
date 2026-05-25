@@ -32,23 +32,41 @@ import {
   LayoutDashboard,
   Menu,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  HardHat,
+  Wrench,
+  Star
 } from 'lucide-react';
 import { Property, CurrencyCode } from '../types';
 
 interface RegistrationRequest {
   id: string;
-  name: string;
+  verificationType: 'individual' | 'company';
+  title?: string;
+  firstName?: string;
+  middleName?: string;
+  surname?: string;
+  name: string; // Combined display name (either full name or company name)
   phone: string;
   email: string;
   preferredPassword: string;
-  notes?: string;
+  notes?: string; // Brief Onboarding Note
   status: 'pending' | 'approved' | 'rejected' | 'more_info';
   submittedAt: string;
   decisionDate?: string;
   adminNotes?: string;
   generatedUsername?: string;
   generatedPassword?: string;
+  
+  // Anti-fraud detail fields
+  nationalId?: string; // National ID Card
+  companyName?: string; // Company Name
+  companyRegistrationNumber?: string; // Company Registration Number 
+  role: string; // Vetted role
+  idCardPhoto?: string; // Scanned file uploads or Camera snap (base64)
+  companyCertificatePhoto?: string; // scanned document (base64)
+  ipAddress?: string;
+  deviceTrustScore?: number;
 }
 
 interface SupportInquiry {
@@ -88,9 +106,27 @@ export const AdminView: React.FC<AdminViewProps> = ({
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'requests' | 'listings' | 'inquiries' | 'logs'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'requests' | 'listings' | 'inquiries' | 'logs' | 'service_providers'>('overview');
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Service Providers State
+  const [serviceProviders, setServiceProviders] = useState<any[]>(() => {
+    const saved = localStorage.getItem('diaspora_service_providers');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  });
+
+  const saveServiceProviders = (newSps: any[]) => {
+    setServiceProviders(newSps);
+    localStorage.setItem('diaspora_service_providers', JSON.stringify(newSps));
+  };
   
   // Modal states for actioning requests
   const [selectedRequest, setSelectedRequest] = useState<RegistrationRequest | null>(null);
@@ -226,11 +262,46 @@ export const AdminView: React.FC<AdminViewProps> = ({
     }));
   };
 
+  const approveServiceProvider = (id: string) => {
+    const sp = serviceProviders.find(s => s.id === id);
+    if (!sp) return;
+    const updated = serviceProviders.map(s => {
+      if (s.id === id) {
+        return { ...s, status: 'approved' };
+      }
+      return s;
+    });
+    saveServiceProviders(updated);
+    addLog(`Approved Service Provider "${sp.name}" as verified ${sp.specialty}.`, 'security');
+  };
+
+  const rejectServiceProvider = (id: string) => {
+    const sp = serviceProviders.find(s => s.id === id);
+    if (!sp) return;
+    const updated = serviceProviders.map(s => {
+      if (s.id === id) {
+        return { ...s, status: 'rejected' };
+      }
+      return s;
+    });
+    saveServiceProviders(updated);
+    addLog(`Rejected/Declined Service Provider "${sp.name}".`, 'security');
+  };
+
+  const deleteServiceProvider = (id: string) => {
+    const sp = serviceProviders.find(s => s.id === id);
+    if (!sp) return;
+    const updated = serviceProviders.filter(s => s.id !== id);
+    saveServiceProviders(updated);
+    addLog(`Permanently deleted Service Provider "${sp.name}" from system records.`, 'security');
+  };
+
   // Stats Counters
   const totalPropertiesCount = properties.length;
   const pendingRequests = registrationRequests.filter(r => r.status === 'pending').length;
   const approvedSellers = registrationRequests.filter(r => r.status === 'approved').length;
   const activeSupportCount = supportInquiries.filter(i => i.status === 'pending').length;
+  const pendingServiceProviders = serviceProviders.filter(s => s.status === 'pending').length;
 
   if (!isAdminLoggedIn) {
     return (
@@ -244,15 +315,15 @@ export const AdminView: React.FC<AdminViewProps> = ({
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-7 space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/5 text-primary rounded-full text-xs font-black uppercase tracking-widest border border-primary/10">
+          <div className="lg:col-span-7 space-y-6 flex flex-col items-center text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/5 text-primary rounded-full text-xs font-black uppercase tracking-widest border border-primary/10 justify-center">
               <ShieldCheck className="w-4 h-4 text-secondary" /> Secure Administrator Console
             </div>
-            <h1 className="text-4xl md:text-6xl font-black text-primary tracking-tighter leading-none">
+            <h1 className="text-4xl md:text-6xl font-black text-primary tracking-tighter leading-none text-center">
               Supervise & Safeguard <br />
               <span className="text-secondary italic">Diaspora Real Estate.</span>
             </h1>
-            <p className="text-lg text-on-surface-variant/80 font-medium max-w-xl leading-relaxed">
+            <p className="text-lg text-on-surface-variant/80 font-medium max-w-xl leading-relaxed text-center">
               Verify legal identities, grant access passes to approved Sellers/Agents, and regulate the entire listing ecosystem to maintain absolute security.
             </p>
             
@@ -351,8 +422,80 @@ export const AdminView: React.FC<AdminViewProps> = ({
   }
 
   return (
-    <div className="min-h-screen bg-background relative flex flex-col lg:flex-row">
-      {/* Mobile Backdrop Overlay */}
+    <div className="min-h-screen bg-background relative flex flex-col lg:flex-row pb-24 lg:pb-0">
+      
+      {/* MOBILE COMPACT TOP ACTIONS HEADER */}
+      <div className="lg:hidden flex items-center justify-between px-6 py-4 bg-white border-b border-surface-variant/10 shadow-sm sticky top-0 z-[9999] w-full shrink-0">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center text-white">
+            <ShieldCheck className="w-4 h-4 text-secondary animate-pulse" />
+          </div>
+          <div>
+            <span className="text-[10px] font-black text-primary tracking-tight uppercase block leading-none">Admin Supervisory</span>
+            <span className="text-[8px] font-bold text-on-surface-variant/50 uppercase tracking-widest mt-0.5 block">Mobile console</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button 
+            type="button"
+            onClick={onBack}
+            className="px-3 py-1.5 bg-background hover:bg-surface-variant/10 rounded-lg text-[9px] font-black uppercase tracking-widest text-on-surface-variant transition-colors"
+          >
+            Exit App
+          </button>
+          <button 
+            type="button"
+            onClick={handleAdminLogout}
+            className="px-3 py-1.5 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-colors"
+          >
+            Sign Out
+          </button>
+        </div>
+      </div>
+
+      {/* MOBILE RESPONSIVE BOTTOM TAB BAR */}
+      <div className="lg:hidden fixed bottom-2 left-2 right-2 bg-white/95 backdrop-blur-xl border border-surface-variant/20 rounded-2xl p-2 flex items-center justify-around shadow-2xl z-[10003] h-16 shrink-0">
+        {[
+          { id: 'overview', label: 'Monitor', icon: <LayoutDashboard className="w-4.5 h-4.5" /> },
+          { id: 'requests', label: 'Sellers', count: pendingRequests, icon: <Users className="w-4.5 h-4.5" /> },
+          { id: 'service_providers', label: 'Services', count: pendingServiceProviders, icon: <HardHat className="w-4.5 h-4.5" /> },
+          { id: 'listings', label: 'Listings', icon: <Building2 className="w-4.5 h-4.5" /> },
+          { id: 'inquiries', label: 'Web Mail', count: activeSupportCount, icon: <Mail className="w-4.5 h-4.5" /> },
+          { id: 'logs', label: 'Audit', icon: <FileText className="w-4.5 h-4.5" /> }
+        ].map(tab => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id as any);
+                window.scrollTo(0, 0);
+              }}
+              className={`flex-1 flex flex-col items-center justify-center relative py-1 rounded-xl transition-all ${
+                isActive ? 'text-primary' : 'text-on-surface-variant/60 hover:text-primary'
+              }`}
+            >
+              <div className="relative">
+                {tab.icon}
+                {tab.count !== undefined && tab.count > 0 && (
+                  <span className="absolute -top-2.5 -right-3 bg-red-500 text-white font-sans text-[8px] font-black h-4 w-4 rounded-full flex items-center justify-center border border-white">
+                    {tab.count}
+                  </span>
+                )}
+              </div>
+              <span className="text-[8px] font-black uppercase tracking-wider mt-1">{tab.label}</span>
+              {isActive && (
+                <motion.div
+                  layoutId="bottomTabIndicator"
+                  className="absolute bottom-0 h-0.5 w-4 bg-secondary rounded-full"
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Mobile Backdrop Overlay for Admin Sidebar in tablet layout if toggled */}
       {isSidebarVisible && (
         <div 
           onClick={() => setIsSidebarVisible(false)}
@@ -360,11 +503,11 @@ export const AdminView: React.FC<AdminViewProps> = ({
         />
       )}
 
-      {/* Floating Toggle Button when Sidebar is Hidden */}
+      {/* Floating Toggle Button when Sidebar is Hidden (Desktop Only) */}
       {!isSidebarVisible && (
         <button
           onClick={() => setIsSidebarVisible(true)}
-          className="fixed top-6 left-6 z-[9990] bg-primary text-white p-3.5 rounded-2xl shadow-2xl hover:bg-secondary hover:scale-105 active:scale-95 transition-all flex items-center gap-2.5 font-black text-[10px] uppercase tracking-widest border border-white/10"
+          className="hidden lg:flex fixed top-6 left-6 z-[9990] bg-primary text-white p-3.5 rounded-2xl shadow-2xl hover:bg-secondary hover:scale-105 active:scale-95 transition-all items-center gap-2.5 font-black text-[10px] uppercase tracking-widest border border-white/10"
           title="Show Sidebar Dashboard"
         >
           <Menu className="w-5 h-5 text-secondary" />
@@ -372,18 +515,18 @@ export const AdminView: React.FC<AdminViewProps> = ({
         </button>
       )}
 
-      {/* Sidebar Dashboard Navigation */}
+      {/* Sidebar Dashboard Navigation (Large Screen Only by default, toggleable) */}
       <aside 
         className={`bg-white border-r border-surface-variant/10 shadow-sm flex flex-col fixed top-0 left-0 h-screen z-[10001] overflow-y-auto transition-all duration-300 ease-in-out ${
           isSidebarVisible ? 'w-72 translate-x-0 opacity-100' : 'w-72 -translate-x-full opacity-0 pointer-events-none'
-        }`}
+        } hidden lg:flex`}
       >
         <div className="p-6 flex flex-col gap-6 h-full min-w-[288px]">
           {/* Logo & Title & Hide Button */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center text-white shadow-lg shrink-0">
-                <ShieldCheck className="w-5 h-5 text-secondary" />
+                <ShieldCheck className="w-5 h-5 text-secondary animate-pulse" />
               </div>
               <div>
                 <h1 className="text-sm font-black text-primary tracking-tighter leading-none mb-0.5">Admin Supervisory</h1>
@@ -407,6 +550,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
             {[
               { id: 'overview', label: 'Monitor Board', icon: <LayoutDashboard className="w-4 h-4" /> },
               { id: 'requests', label: `Sellers Requests`, count: pendingRequests, icon: <Users className="w-4 h-4" /> },
+              { id: 'service_providers', label: `Service Providers`, count: pendingServiceProviders, icon: <HardHat className="w-4 h-4" /> },
               { id: 'listings', label: 'Listings Regulator', icon: <Building2 className="w-4 h-4" /> },
               { id: 'inquiries', label: `Web Mail`, count: activeSupportCount, icon: <Mail className="w-4 h-4" /> },
               { id: 'logs', label: 'Audit Log Trail', icon: <FileText className="w-4 h-4" /> }
@@ -466,7 +610,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
       <div 
         className={`flex-1 w-full px-6 py-10 space-y-10 min-h-screen transition-all duration-300 ${
           isSidebarVisible ? 'lg:pl-80' : 'lg:pl-6'
-        } ${!isSidebarVisible ? 'pt-24 lg:pt-10' : ''}`}
+        } ${!isSidebarVisible ? 'pt-6 lg:pt-10' : ''}`}
       >
         
         {/* VIEW: OVERVIEW */}
@@ -550,9 +694,25 @@ export const AdminView: React.FC<AdminViewProps> = ({
                     {registrationRequests.filter(r => r.status === 'pending').slice(0, 3).map(req => (
                       <div key={req.id} className="py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div>
-                          <p className="font-black text-primary text-base">{req.name}</p>
-                          <p className="text-xs font-bold text-on-surface-variant/70 mt-0.5 flex items-center gap-2">
-                            <span>Phone: {req.phone}</span> • <span>Email: {req.email || "N/A"}</span>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="font-black text-primary text-base">{req.name}</p>
+                            <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${
+                              req.verificationType === 'company' 
+                                ? 'bg-blue-50 text-blue-600 border border-blue-100' 
+                                : 'bg-indigo-50 text-indigo-600 border border-indigo-100'
+                            }`}>
+                              {req.verificationType || 'individual'}
+                            </span>
+                            {req.deviceTrustScore && (
+                              <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase ${
+                                req.deviceTrustScore >= 95 ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600'
+                              }`}>
+                                Trust Score: {req.deviceTrustScore}%
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs font-bold text-on-surface-variant/70 mt-1 flex items-center gap-2">
+                            <span className="font-black text-secondary">{req.role || 'Partner'}</span> • <span>Phone: {req.phone}</span> • <span>Email: {req.email || "N/A"}</span>
                           </p>
                           <p className="text-xs italic text-on-surface-variant/50 mt-1 max-w-lg">"Applying for: {req.notes || "Professional landlord selling real estate properties."}"</p>
                         </div>
@@ -641,12 +801,69 @@ export const AdminView: React.FC<AdminViewProps> = ({
                     registrationRequests.map(req => (
                       <tr key={req.id} className="hover:bg-background/20 transition-all">
                         <td className="py-5 pl-4">
-                          <p className="font-black text-primary text-base">{req.name}</p>
-                          <p className="text-xs font-bold text-on-surface-variant/80 mt-0.5">{req.email} • {req.phone}</p>
-                          <p className="text-xs text-on-surface-variant/40 mt-1 uppercase font-black">Submitted: {req.submittedAt}</p>
+                          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                            <p className="font-black text-primary text-base">{req.name}</p>
+                            <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${
+                              req.verificationType === 'company' 
+                                ? 'bg-blue-50 text-blue-600 border border-blue-100' 
+                                : 'bg-indigo-50 text-indigo-600 border border-indigo-100'
+                            }`}>
+                              {req.verificationType || 'individual'}
+                            </span>
+                            {req.deviceTrustScore && (
+                              <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase ${
+                                req.deviceTrustScore >= 94 ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600'
+                              }`}>
+                                Trust: {req.deviceTrustScore}%
+                              </span>
+                            )}
+                          </div>
+                          
+                          <div className="space-y-1 pl-1">
+                            <p className="text-xs font-bold text-on-surface-variant/80 flex flex-wrap items-center gap-x-2">
+                              <span className="text-primary font-black">Role: {req.role || 'Agent'}</span>
+                              <span>• Email: {req.email}</span>
+                              <span>• Phone: {req.phone}</span>
+                            </p>
+                            
+                            {/* Differentiated verification specifications */}
+                            <div className="text-[11px] font-medium text-on-surface-variant/70 space-y-0.5 bg-background/40 p-2.5 rounded-xl border border-surface-variant/10 mt-2 max-w-md">
+                              {req.verificationType === 'company' ? (
+                                <>
+                                  <p className="font-semibold text-secondary">🏢 Company: <strong className="text-primary font-bold">{req.companyName}</strong></p>
+                                  <p>📜 Regulatory/Inc. ID: <code className="font-mono bg-white px-1 py-0.5 border border-surface-variant/10 rounded">{req.companyRegistrationNumber}</code></p>
+                                  {req.companyCertificatePhoto && (
+                                    <div className="mt-1 flex items-center gap-2">
+                                      <span className="text-[9px] uppercase tracking-wider font-extrabold text-blue-600 bg-blue-50 px-1 rounded">Cert Uploaded</span>
+                                      <a href={req.companyCertificatePhoto} target="_blank" rel="noreferrer" className="text-[9px] text-primary hover:underline font-bold">Preview Document</a>
+                                    </div>
+                                  )}
+                                </>
+                              ) : (
+                                <>
+                                  <p className="font-semibold text-secondary">👤 Personal Name: <strong className="text-primary font-bold">{req.title} {req.firstName} {req.middleName ? req.middleName + ' ' : ''}{req.surname}</strong></p>
+                                  <p>🪪 National ID Card: <code className="font-mono bg-white px-1 py-0.5 border border-surface-variant/10 rounded">{req.nationalId}</code></p>
+                                  {req.idCardPhoto && (
+                                    <div className="mt-1.5 flex items-center gap-2">
+                                      <div className="w-10 h-7 overflow-hidden rounded border border-surface-variant/20 shrink-0">
+                                        <img src={req.idCardPhoto} alt="national-id-scan" className="w-full h-full object-cover pointer-events-none" referrerPolicy="no-referrer" />
+                                      </div>
+                                      <a href={req.idCardPhoto} target="_blank" rel="noreferrer" className="text-[9px] text-primary hover:underline font-extrabold uppercase tracking-wide">Zoom ID Photograph</a>
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                              
+                              {req.ipAddress && (
+                                <p className="text-[9px] text-on-surface-variant/40 mt-1 uppercase font-mono tracking-widest">Metadata Footprint: {req.ipAddress}</p>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <p className="text-xs text-on-surface-variant/40 mt-2 uppercase font-black tracking-wider pl-1">Submitted: {req.submittedAt}</p>
                           {req.notes && (
-                            <p className="text-xs font-bold text-on-surface-variant bg-primary/5 p-2 rounded-lg border border-primary/5 mt-2 max-w-sm font-sans italic">
-                              "{req.notes}"
+                            <p className="text-xs font-bold text-on-surface-variant bg-primary/5 p-3 rounded-xl border border-primary/5 mt-2.5 max-w-sm font-sans italic">
+                              Onboarding Statement: "{req.notes}"
                             </p>
                           )}
                         </td>
@@ -878,6 +1095,170 @@ export const AdminView: React.FC<AdminViewProps> = ({
           </div>
         )}
 
+        {/* VIEW: SERVICE PROVIDERS MANAGEMENT */}
+        {activeTab === 'service_providers' && (
+          <div className="bg-white p-6 md:p-10 rounded-[2.5rem] border border-surface-variant/15 shadow-sm space-y-8 text-left">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-surface-variant/10 pb-6">
+              <div>
+                <h2 className="text-2xl font-black text-primary tracking-tight font-headline">Service Providers Security Vetting</h2>
+                <p className="text-xs font-bold text-on-surface-variant/60 uppercase tracking-widest mt-1">Approve, reject, or suspend company and individual service providers</p>
+              </div>
+              <div className="flex bg-primary/5 p-1 rounded-xl border items-center">
+                <span className="px-3 py-1.5 text-[10px] font-black uppercase text-primary border-r">Pending: {pendingServiceProviders}</span>
+                <span className="px-3 py-1.5 text-[10px] font-black uppercase text-secondary">Total: {serviceProviders.length}</span>
+              </div>
+            </div>
+
+            {/* Providers Search / Filtering in Admin */}
+            <div className="w-full relative max-w-md">
+              <input 
+                type="text" 
+                placeholder="Search registered providers..."
+                className="w-full bg-background border-none rounded-xl pl-10 pr-4 py-2.5 text-xs font-bold outline-none ring-1 ring-surface-variant/10 focus:ring-2 focus:ring-primary/25"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <Search className="w-3.5 h-3.5 text-on-surface-variant/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            </div>
+
+            <div className="space-y-6">
+              {serviceProviders.length === 0 ? (
+                <div className="py-12 text-center text-on-surface-variant italic font-semibold">No service providers registered on the system yet. Let some sign up!</div>
+              ) : (
+                serviceProviders
+                  .filter(sp => sp.name.toLowerCase().includes(searchQuery.toLowerCase()) || sp.specialty.toLowerCase().includes(searchQuery.toLowerCase()))
+                  .map(sp => {
+                    const isApproved = sp.status === 'approved';
+                    const isRejected = sp.status === 'rejected';
+                    return (
+                      <div 
+                        key={sp.id}
+                        className={`p-6 rounded-[2rem] border transition-all ${
+                          sp.status === 'approved' 
+                            ? 'bg-green-50/10 border-green-200 shadow-sm' 
+                            : sp.status === 'rejected'
+                            ? 'bg-red-50/10 border-red-100 opacity-60'
+                            : 'bg-amber-50/20 border-amber-200 shadow-md border-l-4 border-l-amber-500'
+                        } flex flex-col space-y-4 text-left`}
+                      >
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-surface-variant/5 pb-4">
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h3 className="font-extrabold text-primary text-lg">{sp.name}</h3>
+                              <span className={`px-2.5 py-0.5 rounded text-[8px] font-black uppercase ${
+                                sp.verificationType === 'company' ? 'bg-blue-100 text-blue-700' : 'bg-indigo-100 text-indigo-700'
+                              }`}>
+                                {sp.verificationType}
+                              </span>
+                              <span className="bg-primary/5 text-primary text-[9px] font-black uppercase px-2 py-0.5 rounded border">
+                                {sp.category}: {sp.specialty}
+                              </span>
+                            </div>
+                            <p className="text-xs font-bold text-on-surface-variant/70 mt-1">
+                              <strong>Role/Position:</strong> {sp.role} | <strong>Submitted:</strong> {sp.submittedAt}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                              sp.status === 'approved' 
+                                ? 'bg-green-100 text-green-700 border' 
+                                : sp.status === 'rejected'
+                                ? 'bg-red-100 text-red-700 border'
+                                : 'bg-amber-100 text-amber-700 border animate-pulse'
+                            }`}>
+                              STATUS: {sp.status}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Middle detailed dossier row */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-on-surface-variant font-medium">
+                          <div className="space-y-1.5 text-left">
+                            <p>📞 <strong>Phone:</strong> {sp.phone}</p>
+                            <p>✉️ <strong>Email Address:</strong> {sp.email}</p>
+                            {sp.verificationType === 'company' ? (
+                              <p>🏢 <strong>Company Registration Number:</strong> <code className="font-mono bg-white px-1 border rounded">{sp.companyRegistrationNumber || 'N/A'}</code></p>
+                            ) : (
+                              <>
+                                <p>👤 <strong>Legal Identity:</strong> {sp.title || 'Mr'} {sp.firstName} {sp.middleName ? sp.middleName + ' ' : ''}{sp.surname}</p>
+                                <p>🪪 <strong>National/Passport ID:</strong> <code className="font-mono bg-white px-1 border rounded">{sp.nationalId || 'N/A'}</code></p>
+                              </>
+                            )}
+                            <p className="text-[10px] italic bg-white p-3 rounded-xl border mt-2">
+                              <strong>Onboarding Note:</strong> "{sp.notes || 'No notes provided'}"
+                            </p>
+                          </div>
+
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between text-[10px] font-mono border-b pb-1.5">
+                              <span>DEVICE SECURITY SCORE:</span>
+                              <span className="text-green-600 font-extrabold">{sp.deviceTrustScore || '96'}% (SECURE)</span>
+                            </div>
+                            <div className="flex items-center justify-between text-[10px] font-mono">
+                              <span>ORIGIN IP:</span>
+                              <span className="text-primary font-bold">{sp.ipAddress || '196.223.14.94'}</span>
+                            </div>
+
+                            {/* Attachments if any */}
+                            {sp.verificationType === 'company' ? (
+                              sp.companyCertificatePhoto && (
+                                <div className="p-3.5 bg-background rounded-xl border flex items-center justify-between text-[11px] font-black uppercase tracking-wider">
+                                  <span>📄 Corporate License Doc</span>
+                                  <a href={sp.companyCertificatePhoto} target="_blank" rel="noreferrer" className="text-secondary hover:underline">Open Full Document</a>
+                                </div>
+                              )
+                            ) : (
+                              sp.idCardPhoto && (
+                                <div className="p-3 bg-background rounded-xl border flex items-center justify-between text-[11px] font-black uppercase tracking-wider">
+                                  <div className="flex items-center gap-2">
+                                    <img src={sp.idCardPhoto} alt="Personal ID" className="w-10 h-7 object-cover rounded border" />
+                                    <span>👤 National ID Scan</span>
+                                  </div>
+                                  <a href={sp.idCardPhoto} target="_blank" rel="noreferrer" className="text-secondary hover:underline font-bold">Open View</a>
+                                </div>
+                              )
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Actions footer wrapper */}
+                        <div className="border-t border-surface-variant/5 pt-4 flex justify-between items-center flex-wrap gap-4">
+                          <button
+                            onClick={() => deleteServiceProvider(sp.id)}
+                            className="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all"
+                            title="Completely Purge Record"
+                          >
+                            Purge Provider
+                          </button>
+
+                          <div className="flex gap-2">
+                            {!isApproved && (
+                              <button
+                                onClick={() => approveServiceProvider(sp.id)}
+                                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                              >
+                                ✓ Grant Verification Clearance
+                              </button>
+                            )}
+                            {!isRejected && (
+                              <button
+                                onClick={() => rejectServiceProvider(sp.id)}
+                                className="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                              >
+                                Decline / Suspend
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+              )}
+            </div>
+          </div>
+        )}
+
         {/* VIEW: SYSTEM LOGS AUDIT TRAIL */}
         {activeTab === 'logs' && (
           <div className="bg-white p-6 md:p-10 rounded-[2.5rem] border border-surface-variant/15 shadow-sm space-y-6">
@@ -945,6 +1326,62 @@ export const AdminView: React.FC<AdminViewProps> = ({
                   {actionType === 'more_info' && 'Request Extra Information'}
                 </h3>
                 <p className="text-xs font-bold text-on-surface-variant/70 mt-1 uppercase">For Agent: {selectedRequest.name}</p>
+
+                {/* Secure Dossier Card */}
+                <div className="mt-4 p-4 rounded-2xl bg-primary/5 border border-primary/5 text-left space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-black text-primary uppercase tracking-widest">Verification Dossier</span>
+                    <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase ${
+                      selectedRequest.verificationType === 'company' ? 'bg-blue-100 text-blue-700' : 'bg-indigo-100 text-indigo-700'
+                    }`}>
+                      {selectedRequest.verificationType || 'Individual'}
+                    </span>
+                  </div>
+
+                  <div className="text-xs space-y-1.5 font-medium text-on-surface-variant">
+                    {selectedRequest.verificationType === 'company' ? (
+                      <>
+                        <p>🏢 <strong>Company Registered Name:</strong> {selectedRequest.companyName || selectedRequest.name}</p>
+                        <p>📜 <strong>Reg/Inc. Number:</strong> <code className="font-mono bg-white px-1 border rounded">{selectedRequest.companyRegistrationNumber || 'N/A'}</code></p>
+                      </>
+                    ) : (
+                      <>
+                        <p>👤 <strong>Legal Identity:</strong> {selectedRequest.title || 'Mr'} {selectedRequest.firstName} {selectedRequest.middleName ? selectedRequest.middleName + ' ' : ''}{selectedRequest.surname}</p>
+                        <p>🪪 <strong>National/Passport ID:</strong> <code className="font-mono bg-white px-1 border rounded">{selectedRequest.nationalId || 'N/A'}</code></p>
+                      </>
+                    )}
+                    <p>💼 <strong>Proposed Professional Role:</strong> {selectedRequest.role || 'Agent'}</p>
+                    <p>📞 <strong>Phone:</strong> {selectedRequest.phone} | ✉️ <strong>Email:</strong> {selectedRequest.email}</p>
+                    <p>🔒 <strong>Passkey Requested:</strong> <code className="font-mono border px-1 bg-white">{selectedRequest.preferredPassword}</code></p>
+                    <p className="text-[10px] italic bg-white p-2 rounded-lg border">
+                      <strong>Onboarding Note:</strong> "{selectedRequest.notes || 'No note supplied'}"
+                    </p>
+
+                    {/* Image thumb */}
+                    {selectedRequest.verificationType === 'company' ? (
+                      selectedRequest.companyCertificatePhoto && (
+                        <div className="flex items-center gap-2 mt-2 pt-1 border-t">
+                          <span className="text-[9px] font-black uppercase text-secondary">Inc. Doc Scanned:</span>
+                          <a href={selectedRequest.companyCertificatePhoto} target="_blank" rel="noreferrer" className="text-[9px] text-primary hover:underline font-bold">Open Full scan</a>
+                        </div>
+                      )
+                    ) : (
+                      selectedRequest.idCardPhoto && (
+                        <div className="flex items-center gap-2 mt-2 pt-1 border-t">
+                          <span className="text-[9px] font-black uppercase text-secondary">National ID Card:</span>
+                          <img src={selectedRequest.idCardPhoto} alt="national ID" className="w-12 h-8 object-cover rounded border" />
+                          <a href={selectedRequest.idCardPhoto} target="_blank" rel="noreferrer" className="text-[9px] text-primary hover:underline font-bold">Open Full scan</a>
+                        </div>
+                      )
+                    )}
+
+                    {/* Metadata indicators */}
+                    <div className="flex justify-between items-center text-[9px] text-on-surface-variant/40 pt-1 border-t font-mono">
+                      <span>IP: {selectedRequest.ipAddress || 'Not Tracked'}</span>
+                      <span className="text-green-600 font-bold">TRUST METRIC: {selectedRequest.deviceTrustScore || '95'}%</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {actionType === 'approve' && (
